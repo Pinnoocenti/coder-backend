@@ -15,8 +15,11 @@ class ProductManager {
             return []
         }
     }
-    async addProduct(title, description, price, thumbnail, code, stock){ 
-        if(!title || !description || !price || !thumbnail || !code || !stock){
+    async addProduct({title, description, price, thumbnail, code, stock, category, status = true, available}){ 
+        if(available === undefined || available === null){
+            return console.log('Available is not complete')
+        }
+        if(!title || !description || !price || !code || !stock || !category){
             return console.log('Incomplete product')
         }
         const products = await this.getProducts()
@@ -28,10 +31,14 @@ class ProductManager {
             price,
             thumbnail,
             code,
-            stock
+            stock, 
+            category,
+            status,
+            available
         }
         products.push(product)
         await fs.promises.writeFile(this.path, JSON.stringify(products), 'utf-8')
+        return product
     }
     async getProductById(id){
         const products = await this.getProducts() 
@@ -42,22 +49,26 @@ class ProductManager {
         console.log(productById)
         return productById
     }
-    async updateProduct(id, fieldToModify, newData){
+    async updateProduct(id, productToModify){
         const products = await this.getProducts() 
-        let productById = products.find(prod => prod.id === id)
-        if(productById){
-            productById[fieldToModify] = newData
-        } else{
-            console.log('The product does not exist')
+        const pos = products.findIndex(prod => prod.id === id)
+        if(isNaN(pos)){
+            return console.log('The product does not exist')
         }
+        products[pos] = {
+            id,
+            ...productToModify
+            
+        }
+        
         await fs.promises.writeFile(this.path, JSON.stringify(products))
-
+        return products[pos]
     }
     async deleteProduct(id){ 
         const products = await this.getProducts() 
-        const modifyProducts = products.filter(prod => prod.id !== id)
-        if(modifyProducts){
-            await fs.promises.writeFile(this.path, JSON.stringify(modifyProducts), 'utf-8')
+        const productToBeDeleted = products.filter(prod => prod.id !== id)
+        if(productToBeDeleted){
+            await fs.promises.writeFile(this.path, JSON.stringify(productToBeDeleted), 'utf-8')
         } else{
             return console.error('The product does not exist')
         }
@@ -67,7 +78,7 @@ class ProductManager {
 
 export default ProductManager
 
-const test= async ()=>{
+/*const test= async ()=>{
     const productManager = new ProductManager('./products.json')
     await productManager.addProduct("producto prueba 1", "Este es un producto prueba", 200, "Sin imagen", "abc123", 25)
     await productManager.addProduct("producto prueba 2", "Este es un producto prueba 2", 250, "Sin imagen", "abc124", 25)
@@ -84,7 +95,7 @@ const test= async ()=>{
     //await productManager.deleteProduct(2)
     
     //console.log(await productManager.getProducts())
-}
+}*/
 
 
 
