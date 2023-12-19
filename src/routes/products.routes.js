@@ -1,7 +1,7 @@
 import { Router } from "express";
 import ProductManager from "../ProductManager.js";
 
-const productManager = new ProductManager('./products.json')
+export const productManager = new ProductManager('./products.json')
 const productsRouter = Router()
 
 
@@ -9,14 +9,14 @@ productsRouter.get('/', async (req, res)=>{
     const products = await productManager.getProducts()
     let {limit } = req.query
     if(!limit){
-        return res.send(products)
+        return res.render('home', {products, title:'Products'})
     }
     limit = parseInt(limit)
     if(isNaN(limit)){
         return res.status(400).send('Limit must be a number')
     }
     const limitedProducts = products.slice(0, limit)
-    res.send(limitedProducts)
+    res.render('home',{limitedProducts, title: 'Products'})
 })
 
 productsRouter.get('/:pid', async (req, res)=>{

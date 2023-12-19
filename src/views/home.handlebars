@@ -1,0 +1,30 @@
+<h1>Los productos agregados hasta el momento son:</h1>
+
+<div>
+    {{#if limitedProducts}}
+        {{#each limitedProducts}}
+            <h3>Producto: {{this.title}}</h3>
+            <p>Descripción: {{this.description}}</p>
+            <p>Precio: {{this.price}}</p>
+            <p>Código: {{this.code}}</p>
+            <p>Stock: {{this.stock}}</p>
+            <p>Categoría: {{this.category}}</p>
+            <p>Status: {{this.status}}</p>
+            <p>Habilitado: {{this.available}}</p>
+        {{/each}}
+    {{else}}
+        {{#each products}}
+            <h3>Producto: {{this.title}}</h3>
+            <p>Descripción: {{this.description}}</p>
+            <p>Precio: {{this.price}}</p>
+            <p>Código: {{this.code}}</p>
+            <p>Stock: {{this.stock}}</p>
+            <p>Categoría: {{this.category}}</p>
+            <p>Status: {{this.status}}</p>
+            <p>Habilitado: {{this.available}}</p>
+        {{/each}}
+    {{/if}}
+</div>
+
+
+<script src="js/index.js"></script>
