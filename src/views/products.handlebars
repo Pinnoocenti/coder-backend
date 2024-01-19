@@ -1,7 +1,7 @@
-<h1>Los productos agregados hasta el momento son:</h1>
+<h1>Productos</h1>
 
 <div>
-    {{#each data.payload}}
+    {{#each products.docs}}
     <div>
         <h3>Producto: {{this.title}}</h3>
         <p>Descripción: {{this.description}}</p>
@@ -11,21 +11,20 @@
         <p>Categoría: {{this.category}}</p>
         <p>Status: {{this.status}}</p>
         <p>Habilitado: {{this.available}}</p>
+
+        <button id="{{this._id}}">Agregar al carrito</button>
     </div>
-    <br>
-    <br>
     {{/each}}
-    {{#if productsData.hasPrevPage}}
-        <button><a href={{productsData.prevLink}}>Pagina anterior</a></button>
+
+    {{#if products.hasPrevPage}}
+        <button><a href={{products.prevLink}}>Pagina anterior</a></button>
     {{/if}}
 
-    <span>Pagina: {{productsData.page}}</span>
+    <span>Pagina: {{products.page}}</span>
 
     {{#if products.hasNextPage}}
-        <button><a href={{productsData.nextLink}}>Pagina siguiente</a></button>
+        <button><a href={{products.nextLink}}>Pagina siguiente</a></button>
     {{/if}}
-    
 </div>
 
-
-<script src="js/index.js"></script>
+<script src="js/products.js"></script>

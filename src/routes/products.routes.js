@@ -1,65 +1,84 @@
 import { Router } from "express";
-import ProductManager from "../ProductManager.js";
+import ProductManager from "../dao/ManagerFS/ProductManager.js";
+import { uploader } from "../utils/multer.js";
+import { productModel } from "../dao/models/product.model.js";
+import ProductManagerDB from "../dao/ManagerDB/productManagerDB.js";
 
-export const productManager = new ProductManager('./products.json')
 const productsRouter = Router()
 
-
-productsRouter.get('/', async (req, res)=>{
-    const products = await productManager.getProducts()
-    let {limit } = req.query
-    if(!limit){
-        return res.render('home', {products, title:'Products'})
+productsRouter.get('/', async (req, res)=>{ 
+    try{
+        const {limit = 10, page = 1, query = '', sort = ''} = req.query
+        const products = new ProductManagerDB()
+        const result = await products.getProducts(limit, page, query, sort)
+        if(result){
+            res.send(result)
+        }else{
+            res.status(400).json({message: 'Not found'})
+        }
+    } catch(error){
+        res.status(400).json({message:'Something went wrong' + error.message})
     }
-    limit = parseInt(limit)
-    if(isNaN(limit)){
-        return res.status(400).send('Limit must be a number')
-    }
-    const limitedProducts = products.slice(0, limit)
-    res.render('home',{limitedProducts, title: 'Products'})
 })
-
 productsRouter.get('/:pid', async (req, res)=>{
-    let {pid} = req.params
-    pid = parseInt(pid)
-    if(isNaN(pid)){
-        return res.status(400).send('The id must be a number')
-    }
-    const product = await productManager.getProductById(pid)
-    res.send(product)
-})
+    try {
+        const {pid} = req.params
+        const product = new ProductManagerDB()
+        const result = await product.getProductById(pid)
 
-productsRouter.post('/', async (req,res)=>{
-    const product = req.body
-    const productCreated = await productManager.addProduct(product)
-    if(productCreated && productCreated.id){
-        res.send(productCreated)
-    } else {
-        return res.status(400).send('Product could not be added')
+        if(result.message === 'ok'){
+            return res.status(200).json(result)
+        }
+        res.send(product)
+    } catch (error) {
+        res.status(400).json({message: 'The products does not exist'})
+    }
+})
+productsRouter.post('/', /*uploader.single('file'),*/ async (req,res)=>{
+    try {
+        const newProduct = req.body
+        console.log(newProduct)
+        const product = new ProductManagerDB()
+        //const path = req.file.path.split('public').join('')
+        //await product.addProduct({...newProduct/*, thunbnail: path*/}) 
+        const result = await product.addProduct(newProduct)
+        if(result.message==='ok'){
+            return res.status(201).json({message: 'Product added'})
+        }
+        res.status(400).json(result)
+    } catch (error) {
+        res.status(400).send(error)
     }
 })
 productsRouter.put('/:pid', async (req,res)=>{
-    let {pid} = req.params
-    pid = parseInt(pid)
-    if(isNaN(pid)){
-        return res.status(400).send('The id must be a number')
-    }
-    const productToModify = req.body
-    const modifiedProduct = await productManager.updateProduct(pid, productToModify)
-    if(modifiedProduct){
-        res.send(modifiedProduct)
-    } else {
-        return res.status(400).send('Product could not be modified')
+
+    try {
+        let {pid} = req.params
+        const productToModify = req.body
+        const products = new ProductManagerDB()
+        
+        const result = await products.updateProduct(pid, productToModify)
+        if(result.message === 'ok'){
+            return res.status(200).json(result)
+        }
+        res.status(400).json(result)
+        
+    } catch (error) {
+        res.status(400).send(error)
     }
 })
 productsRouter.delete('/:pid', async (req, res)=>{
     let {pid} = req.params
-    pid = parseInt(pid)
-    if(isNaN(pid)){
-        return res.status(400).send('The id must be a number')
+    try {
+        const product = new ProductManagerDB()
+        const deleted = await product.deleteProduct(pid)
+        if (deleted.message==='ok'){
+            return res.status(200).json(deleted.rdo)
+        }
+        return res.status(404).json(deleted.rdo)
+    } catch (error) {
+        res.status(400).json({message: 'eror'})
     }
-    await productManager.deleteProduct(pid)
-    res.send({massege: 'The product was removed'})
 })
 
 

@@ -1,24 +1,26 @@
 import { Router } from "express";
 import { socketServer } from "../app.js";
-import { productManager } from "./products.routes.js";
+import ProductManagerDB from "../dao/ManagerDB/productManagerDB.js";
 
 const viewsRoutes = Router()
+const managerProduct = new ProductManagerDB()
 
-viewsRoutes.get('/', (req,res)=>{
-    res.render('realTimeProducts', {title:'realTimeProducts'})
-})
-viewsRoutes.post('/', async (req,res)=>{
-    const product = req.body
-    const productCreated = await productManager.addProduct(product)
-
-    if(productCreated && productCreated.id){
-        const products = await productManager.getProducts()
-        console.log('adentro del productCreated ' + products.length)
-        socketServer.emit('updateProducts', { products })
-        res.render('realTimeProducts', {title:'realTimeProducts'})
-    } else {
-        return res.status(400).send('Product could not be added')
+viewsRoutes.get('/', async (req,res)=>{
+    const result = await managerProduct.getProducts()
+    if(result.message === 'ok'){
+        res.render('home', {title:'home', data: result.rdo})
     }
+})
+viewsRoutes.get('/realtimeproducts', async (req,res)=>{
+    const result = await managerProduct.getProducts()
+    if(result.message === 'ok'){
+        res.render('realTimeProducts', {title:'realTimeProducts', data: result.rdo})
+    }
+})
+viewsRoutes.get('/products', async (req,res)=>{
+    const {page}= req.query
+    const products = await managerProduct.getProducts(10,page)
+    res.render('products', products)
 })
 
 
