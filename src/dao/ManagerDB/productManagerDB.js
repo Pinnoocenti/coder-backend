@@ -22,6 +22,7 @@ class ProductManagerDB {
             })
             productsData.payload = productsData.docs
             delete productsData.docs
+            console.log(productsData)
             return { message: "ok", ...productsData }
 
         } catch (error) {

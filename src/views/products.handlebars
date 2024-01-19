@@ -1,9 +1,10 @@
 <h1>Productos</h1>
 
 <div>
-    {{#each products.docs}}
-    <div>
-        <h3>Producto: {{this.title}}</h3>
+    {{#each payload}}
+    <div class="product-item">
+        <p>Producto: {{this._id}}</p>
+        <p>Producto: {{this.title}}</p>
         <p>Descripción: {{this.description}}</p>
         <p>Precio: {{this.price}}</p>
         <p>Código: {{this.code}}</p>
@@ -16,14 +17,14 @@
     </div>
     {{/each}}
 
-    {{#if products.hasPrevPage}}
-        <button><a href={{products.prevLink}}>Pagina anterior</a></button>
+    {{#if hasPrevPage}}
+        <button><a href="/products?page={{prevPage}}">Pagina anterior</a></button>
     {{/if}}
 
-    <span>Pagina: {{products.page}}</span>
+    <span>Pagina: {{page}}</span>
 
-    {{#if products.hasNextPage}}
-        <button><a href={{products.nextLink}}>Pagina siguiente</a></button>
+    {{#if hasNextPage}}
+        <button><a href="/products?page={{nextPage}}">Pagina siguiente</a></button>
     {{/if}}
 </div>
 

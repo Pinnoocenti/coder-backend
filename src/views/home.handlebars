@@ -15,14 +15,14 @@
     <br>
     <br>
     {{/each}}
-    {{#if productsData.hasPrevPage}}
-        <button><a href={{productsData.prevLink}}>Pagina anterior</a></button>
+    {{#if data.hasPrevPage}}
+        <button><a href={{data.prevLink}}>Página anterior</a></button>
     {{/if}}
 
-    <span>Pagina: {{productsData.page}}</span>
+    <span>Página: {{data.page}}</span>
 
-    {{#if products.hasNextPage}}
-        <button><a href={{productsData.nextLink}}>Pagina siguiente</a></button>
+    {{#if data.hasNextPage}}
+        <button><a href={{data.nextLink}}>Página siguiente</a></button>
     {{/if}}
     
 </div>

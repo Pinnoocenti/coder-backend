@@ -8,7 +8,7 @@ const managerProduct = new ProductManagerDB()
 viewsRoutes.get('/', async (req,res)=>{
     const result = await managerProduct.getProducts()
     if(result.message === 'ok'){
-        res.render('home', {title:'home', data: result.rdo})
+        res.render('home', {title:'home', data: result})
     }
 })
 viewsRoutes.get('/realtimeproducts', async (req,res)=>{

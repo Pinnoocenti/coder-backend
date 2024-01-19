@@ -2,7 +2,7 @@ const buttons = document.getElementsByTagName('button')
 
 const addProductToCart = async(pid) =>{
     try {
-        const result = await fetch(`http://localhost:8080/api/carts//product/${pid}`, {
+        const result = await fetch(`http://localhost:8080/api/carts/65a9d4bac9f14f288fabc3a2/product/${pid}`, {
         body: JSON.stringify({
             quantity: 1
         }), 
@@ -11,19 +11,19 @@ const addProductToCart = async(pid) =>{
             'Content-type': 'application/json'
         }
     })
-    if(result){
+    if(result.status===200 || result.status===201){
         alert('Se agrego correctamente')
     } else{
         alert('error, no se pudo agregar ')
     }
     } catch (error) {
-        
+        alert('Error, no se pudo agregar');
     }
     
 }
 
 for (let btn of buttons){
-    buttons.addEventListener('click', (event)=>{
+    btn.addEventListener('click', (event)=>{
         addProductToCart(btn.id)
     })
 }
