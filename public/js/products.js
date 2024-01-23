@@ -1,4 +1,6 @@
-const buttons = document.getElementsByTagName('button')
+const btns = document.getElementsByName('addToCartButton')
+const  logoutBtn = document.getElementById('logoutBtn')
+
 
 const addProductToCart = async(pid) =>{
     try {
@@ -22,8 +24,19 @@ const addProductToCart = async(pid) =>{
     
 }
 
-for (let btn of buttons){
+for (let btn of btns){
     btn.addEventListener('click', (event)=>{
         addProductToCart(btn.id)
     })
 }
+
+logoutBtn.addEventListener('click', async (e)=>{
+    const result = await fetch('http://localhost:8080/api/session/logout', {
+        method: 'post',
+        headers:{
+            'Content-type': 'application/json'
+        }
+    })
+    const {redirect} = await result.json()
+    window.location.href = redirect
+})

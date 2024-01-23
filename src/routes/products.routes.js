@@ -3,10 +3,11 @@ import ProductManager from "../dao/ManagerFS/ProductManager.js";
 import { uploader } from "../utils/multer.js";
 import { productModel } from "../dao/models/product.model.js";
 import ProductManagerDB from "../dao/ManagerDB/productManagerDB.js";
+import { checkAuth, checkExistingUser } from "../middlewares/auth.js";
 
 const productsRouter = Router()
 
-productsRouter.get('/', async (req, res)=>{ 
+productsRouter.get('/', checkExistingUser, async (req, res)=>{ 
     try{
         const {limit = 10, page = 1, query = '', sort = ''} = req.query
         const products = new ProductManagerDB()

@@ -1,7 +1,8 @@
-<h1>Productos</h1>
+<h1>Bienvenido/a {{user.firstName}}  {{user.lastName}} - Role: {{user.role}}</h1>
 
+<h3>Productos</h3>
 <div>
-    {{#each payload}}
+    {{#each products.payload}}
     <div class="product-item">
         <p>Producto: {{this._id}}</p>
         <p>Producto: {{this.title}}</p>
@@ -13,19 +14,22 @@
         <p>Status: {{this.status}}</p>
         <p>Habilitado: {{this.available}}</p>
 
-        <button id="{{this._id}}">Agregar al carrito</button>
+        <button name="addToCartButton" id="{{this._id}}">Agregar al carrito</button>
     </div>
     {{/each}}
 
-    {{#if hasPrevPage}}
-        <button><a href="/products?page={{prevPage}}">Pagina anterior</a></button>
+    {{#if products.hasPrevPage}}
+        <button><a href="/products?page={{products.prevPage}}">Pagina anterior</a></button>
     {{/if}}
 
-    <span>Pagina: {{page}}</span>
+    <span>Pagina: {{products.page}}</span>
 
-    {{#if hasNextPage}}
-        <button><a href="/products?page={{nextPage}}">Pagina siguiente</a></button>
+    {{#if products.hasNextPage}}
+        <button><a href="/products?page={{products.nextPage}}">Pagina siguiente</a></button>
     {{/if}}
 </div>
+
+
+<button id="logoutBtn" type="button">Cerrar sesión </button>
 
 <script src="js/products.js"></script>
