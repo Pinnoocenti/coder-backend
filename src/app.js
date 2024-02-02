@@ -12,7 +12,8 @@ import FileStore  from 'session-file-store'
 import MongoStore from 'connect-mongo'
 import cookieParser from 'cookie-parser'
 import sessionRoutes from './routes/session.routes.js'
-
+import passport from 'passport'
+import initializePassport from './config/passport.config.js'
 
 const PORT = 8080
 const fileStore = FileStore(session)
@@ -35,6 +36,10 @@ app.use(session({
     resave: true,
     saveUninitialized: true
 }))
+
+initializePassport()
+app.use(passport.initialize())
+app.use(passport.session())
 
 mongoose.connect('mongodb+srv://Pinno:conikpa10@cluster0.cq9w84x.mongodb.net/ecommerce')
 

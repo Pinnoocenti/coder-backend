@@ -33,8 +33,13 @@ viewsRoutes.get('/login', checkExistingUser, (req,res)=>{
     res.render('login', user)
 })
 viewsRoutes.get('/', checkAuth,(req,res)=>{
-    
     res.redirect('/products')
+})
+viewsRoutes.get('/faillogin', (req,res)=>{
+    res.render('faillogin')
+})
+viewsRoutes.get('/failregister', (req, res)=>{
+    res.render('failregister')
 })
 
 export default viewsRoutes

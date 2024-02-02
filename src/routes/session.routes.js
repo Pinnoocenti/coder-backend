@@ -1,60 +1,58 @@
 import { Router } from "express";
 import { userModel } from "../dao/models/user.model.js";
+import { createHash, isValidPassword } from "../utils/bcrypt.js";
+import passport from "passport";
 
 
 const sessionRoutes = Router()
 
-sessionRoutes.post('/register', async (req,res)=>{
-    const {firstName, lastName, email, age, password} = req.body
-    let role = 'user'
-    if(email === 'adminCoder@coder.com' && password === 'adminCod3r123'){
-        role = 'admin'
+sessionRoutes.post('/register',
+    passport.authenticate('register', { failureRedirect: '/failregister' }),
+    async (req, res) => {
+        res.status(201).send({ message: 'User register' })
     }
-    try {
-        const user = await userModel.create({
-            firstName, lastName, age, email, password, role
-        })
-        //req.session.user = user
-        
-        return res.redirect('/login')
-        
-    } catch (error) {
-        console.error(error)
-        res.status(400).send({error})
-    }
-})
-
-sessionRoutes.post('/login', async (req,res)=>{
-    const {email, password} = req.body
-    try {
-        const user = await userModel.findOne({email})
-        if(!user){
-            console.log('User not found')
-            return res.redirect('/login')
+)
+sessionRoutes.post('/login',
+    passport.authenticate('login', {failureRedirect: '/faillogin'}),
+    async (req, res) => {
+        if(!req.user){
+            return res.status(400).send({ message: 'Error with credentials' })
         }
-        if(user.password !== password){
-            console.log('Password invalid')
-            return res.redirect('/login')
-            //return res.status(401).send({message: 'Password invalid'})
-        }
-        req.session.user = user
-        return res.redirect('/products')
-    } catch (error) {
-        res.status(400).send({error})
-    }
-})
 
-sessionRoutes.post('/logout', async (req,res)=>{
+        req.session.user = {
+            firstName: req.user.firstName,
+            lastName: req.user.lastName,
+            age: req.user.age,
+            email: req.user.email
+        }
+        res.redirect('/')
+    }
+)
+
+sessionRoutes.post('/logout', async (req, res) => {
     try {
-        req.session.destroy((err)=>{
-            if(err){
-                return res.status(500).json({message: 'logout failed'})
+        req.session.destroy((err) => {
+            if (err) {
+                return res.status(500).json({ message: 'logout failed' })
             }
-            
+
         })
-        res.send({redirect: 'http://localhost:8080/login'})
+        res.send({ redirect: 'http://localhost:8080/login' })
     } catch (error) {
-        res.status(400).send({error})
+        res.status(400).send({ error })
     }
 })
+sessionRoutes.get(
+    '/github', 
+    passport.authenticate('github', { scope: ['user:email'] }),
+    (req, res) => {}
+)
+sessionRoutes.get(
+    '/githubcallback',
+    passport.authenticate('github', {failureRedirect: '/login'}),
+    (req,res)=>{
+        req.session.user = req.user
+        res.redirect('/')
+    }
+)
 export default sessionRoutes
