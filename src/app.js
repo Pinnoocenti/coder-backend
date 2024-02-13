@@ -16,7 +16,7 @@ import passport from 'passport'
 import initializePassport from './config/passport.config.js'
 
 const PORT = 8080
-const fileStore = FileStore(session)
+//const fileStore = FileStore(session)
 const app = express()
 
 const productManager = new ProductManagerDB()

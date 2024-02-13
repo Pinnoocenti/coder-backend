@@ -1,20 +1,20 @@
 import { Router } from "express";
 import { userModel } from "../dao/models/user.model.js";
-import { createHash, isValidPassword } from "../utils/bcrypt.js";
+import { createHash, isValidPassword } from "../config/bcrypt.js";
 import passport from "passport";
 
 
 const sessionRoutes = Router()
 
 sessionRoutes.post('/register',
-    passport.authenticate('register', { failureRedirect: '/failregister' }),
-    async (req, res) => {
-        res.status(201).send({ message: 'User register' })
+    passport.authenticate('register', { failureRedirect: '/failRegister' }),
+    (req, res) => {
+        res.render('userCreateSuccess')
     }
 )
 sessionRoutes.post('/login',
-    passport.authenticate('login', {failureRedirect: '/faillogin'}),
-    async (req, res) => {
+    passport.authenticate('login', {failureRedirect: '/failLogin'}),
+    (req, res) => {
         if(!req.user){
             return res.status(400).send({ message: 'Error with credentials' })
         }
@@ -23,24 +23,16 @@ sessionRoutes.post('/login',
             firstName: req.user.firstName,
             lastName: req.user.lastName,
             age: req.user.age,
-            email: req.user.email
+            email: req.user.email,
+            role: req.user.role
         }
         res.redirect('/')
     }
 )
 
 sessionRoutes.post('/logout', async (req, res) => {
-    try {
-        req.session.destroy((err) => {
-            if (err) {
-                return res.status(500).json({ message: 'logout failed' })
-            }
-
-        })
-        res.send({ redirect: 'http://localhost:8080/login' })
-    } catch (error) {
-        res.status(400).send({ error })
-    }
+    req.session.user = null
+    res.redirect('/login')
 })
 sessionRoutes.get(
     '/github', 

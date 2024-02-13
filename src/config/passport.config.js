@@ -1,13 +1,13 @@
 import passport from 'passport'
-import local from 'passport-local'
+import {Strategy as LocalStrategy} from 'passport-local'
 import { userModel } from '../dao/models/user.model.js'
-import { createHash, isValidPassword } from '../utils/bcrypt.js'
+import { createHash, isValidPassword } from './bcrypt.js'
 import { Strategy as GithubStrategy } from "passport-github2"
 
-const localStrategy = local.Strategy
 
-const initializePassport = () => { //aca dentro va a etsar cada una de las estrategias 
-    passport.use('register', new localStrategy(
+
+const initializePassport = () => { 
+    passport.use('register', new LocalStrategy(
         { passReqToCallback: true, usernameField: 'email' },
         async (req, username, password, done) => {
             const { firstName, lastName, email, age} = req.body
@@ -31,16 +31,12 @@ const initializePassport = () => { //aca dentro va a etsar cada una de las estra
             }
         }
     ))
-    passport.use('login', new localStrategy(
+    passport.use('login', new LocalStrategy(
         { usernameField: 'email' },
         async (username, password, done) => {
             try {
                 const user = await userModel.findOne({ email: username })
-                if (!user) {
-                    console.log('User doesnt exist')
-                    return done(null, false)
-                }
-                if (!isValidPassword) {
+                if (!user || !isValidPassword(user, password)) {
                     return done(null, false)
                 }
                 return done(null, user)
