@@ -8,19 +8,22 @@ import viewsRoutes from './routes/view.routes.js'
 import ProductManagerDB from './dao/ManagerDB/productManagerDB.js'
 import CartManagerDB from './dao/ManagerDB/cartManagerDB.js'
 import session from 'express-session' 
-import FileStore  from 'session-file-store'
 import MongoStore from 'connect-mongo'
 import cookieParser from 'cookie-parser'
 import sessionRoutes from './routes/session.routes.js'
 import passport from 'passport'
 import initializePassport from './config/passport.config.js'
+import { Command } from 'commander'
+import { getVariables } from './config/config.js'
 
-const PORT = 8080
-//const fileStore = FileStore(session)
 const app = express()
-
+const program = new Command()
 const productManager = new ProductManagerDB()
 const cartManager = new CartManagerDB()
+
+program.option('-m --mode <mode>', 'Modo de trabajo', 'production')
+const options = program.parse()
+const { port,secretPassword, mongoURL} = getVariables(options)
 
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
@@ -30,7 +33,7 @@ app.use(express.static('public'))
 app.use(session({
     secret: 'PilaR@737*Coder',
     store: MongoStore.create({
-        mongoUrl: 'mongodb+srv://Pinno:conikpa10@cluster0.cq9w84x.mongodb.net/ecommerce',
+        mongoUrl: 'mongodb+srv://Pinno:conikpa10@cluster0.cq9w84x.mongodb.net/coder',
         ttl: 60
     }),
     resave: true,
@@ -57,14 +60,11 @@ app.use('/api/carts', cartsRouter)
 app.use('/api/session', sessionRoutes)
 app.use('/', viewsRoutes)
 
-
-
-const httpServer = app.listen(PORT, ()=>{
-    console.log(`Server on ${PORT}`)
+const httpServer = app.listen(8080, ()=>{
+    console.log(`Server on ${8080}`)
 })
 
 const socketServer = new Server(httpServer)
-
 socketServer.on('connection', (socket)=>{
     console.log('New client connected')
 })
