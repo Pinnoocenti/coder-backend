@@ -1,10 +1,15 @@
 import passport from "passport";
 import session from "express-session";
+import UserDTO from "../dao/dto/user.dto.js";
+
 
 export const addRegisterController = (req, res) => {
     res.render('userCreateSuccess')
 }
-
+export const getCurrentUserController = (req,res)=>{
+    const user = new UserDTO(req.user)
+    res.send(user.getCurrentUser)
+}
 export const postLoginSessionController = (req, res) => {
     if(!req.user){
         return res.status(400).send({ message: 'Error with credentials' })

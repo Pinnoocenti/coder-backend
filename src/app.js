@@ -21,19 +21,19 @@ const program = new Command()
 const productManager = new ProductManagerDB()
 const cartManager = new CartManagerDB()
 
-program.option('-m --mode <mode>', 'Modo de trabajo', 'production')
+program.option('--mode <mode>', 'Modo de trabajo', 'production')
 const options = program.parse()
 const { port,secretPassword, mongoURL} = getVariables(options)
 
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
-app.use(cookieParser('PilaR@737*Coder'))
+app.use(cookieParser(secretPassword))
 app.use(express.static('public'))
 
 app.use(session({
-    secret: 'PilaR@737*Coder',
+    secret: secretPassword,
     store: MongoStore.create({
-        mongoUrl: 'mongodb+srv://Pinno:conikpa10@cluster0.cq9w84x.mongodb.net/coder',
+        mongoUrl: mongoURL,
         ttl: 60
     }),
     resave: true,
@@ -44,7 +44,7 @@ initializePassport()
 app.use(passport.initialize())
 app.use(passport.session())
 
-mongoose.connect('mongodb+srv://Pinno:conikpa10@cluster0.cq9w84x.mongodb.net/ecommerce')
+mongoose.connect(mongoURL)
 
 const hbs = handlebars.create({
     runtimeOptions: {
@@ -60,8 +60,8 @@ app.use('/api/carts', cartsRouter)
 app.use('/api/session', sessionRoutes)
 app.use('/', viewsRoutes)
 
-const httpServer = app.listen(8080, ()=>{
-    console.log(`Server on ${8080}`)
+const httpServer = app.listen(port, ()=>{
+    console.log(`Server on ${port}`)
 })
 
 const socketServer = new Server(httpServer)

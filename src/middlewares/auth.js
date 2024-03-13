@@ -14,17 +14,25 @@ export const checkExistingUser = (req,res,next)=>{
     }
     next()
 }
-
+//ver si es necesario o si esta de mas
 export const checkLogin = async (req,res,next) =>{
     const {email, password} = req.body
     try {
         const user = await userModel.findOne({email})
         if(!user || !isValidPassword(user, password)){
-            return res.status(401).send({message:'Unauthorized'})
+            return res.redirect('/failLogin')
         }
         req.user = user
         next()
     } catch (error) {
         console.error(error)
+    }
+}
+export const authorization = (role)=>{
+    return async (req, res, next)=>{
+        if(req.session?.user?.rol !== role){
+            return res.status(403).send({error: 'No permissions'})
+        }
+        next()
     }
 }

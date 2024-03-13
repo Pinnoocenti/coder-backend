@@ -1,5 +1,7 @@
 import ProductManagerDB from "../dao/ManagerDB/productManagerDB.js";
 import { uploader } from "../utils/multer.js";
+import ProductDTO from "../dao/dto/product.dto.js";
+
 
 export const getProductsController = async (req, res)=>{ 
     try{
@@ -31,8 +33,7 @@ export const getProductByIdController = async (req, res)=>{
 }
 export const addProductController = /*uploader.single('file'),*/ async (req,res)=>{
     try {
-        const newProduct = req.body
-        console.log(newProduct)
+        const newProduct = new ProductDTO(req.body)
         const product = new ProductManagerDB()
         //const path = req.file.path.split('public').join('')
         //await product.addProduct({...newProduct/*, thunbnail: path*/}) 

@@ -3,8 +3,14 @@ import {Strategy as LocalStrategy} from 'passport-local'
 import { userModel } from '../dao/models/user.model.js'
 import { createHash, isValidPassword } from './bcrypt.js'
 import { Strategy as GithubStrategy } from "passport-github2"
+import { Command } from 'commander'
+import { getVariables } from './config.js'
 
+const program = new Command()
 
+program.option('--mode <mode>', 'Modo de trabajo', 'production')
+const options = program.parse()
+const { userAdmin, passAdmin} = getVariables(options)
 
 const initializePassport = () => { 
     passport.use('register', new LocalStrategy(
@@ -35,7 +41,16 @@ const initializePassport = () => {
         { usernameField: 'email' },
         async (username, password, done) => {
             try {
-                const user = await userModel.findOne({ email: username })
+                let user
+
+                if(username===userAdmin){
+                    if(password===passAdmin){
+                        user = {firstName:'Coder', lastName: 'Admin', email:username, password: createHash}
+                    }else{
+                        return done(null, false)
+                    }
+                }
+                user = await userModel.findOne({ email: username })
                 if (!user || !isValidPassword(user, password)) {
                     return done(null, false)
                 }
