@@ -73,6 +73,7 @@ class ProductManagerDB {
             console.log(productToModify)
             const update = await productModel.updateOne({ _id: pid }, productToModify)
             if(update.modifiedCount>0) {
+                
                 return { message: 'ok', rdo: 'product modified' }
             }
             return { message: 'error', rdo: 'product not found' }

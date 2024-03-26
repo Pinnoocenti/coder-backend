@@ -34,10 +34,10 @@ app.use(session({
     secret: secretPassword,
     store: MongoStore.create({
         mongoUrl: mongoURL,
-        ttl: 60
+        ttl: 60000
     }),
     resave: true,
-    saveUninitialized: true
+    saveUninitialized: true,
 }))
 
 initializePassport()

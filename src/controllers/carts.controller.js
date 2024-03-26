@@ -1,4 +1,6 @@
 import CartManagerDB from "../dao/ManagerDB/cartManagerDB.js";
+import ProductManagerDB from '../dao/ManagerDB/productManagerDB.js'
+import TicketManager from "../dao/ManagerDB/ticketManagerDB.js";
 
 export const getCartsController = async (req,res)=>{
     try {
@@ -110,5 +112,43 @@ export const deleteAllProductsInCartController = async (req,res)=>{
         }
     } catch (error) {
         res.status(400).json({message: error})
+    }
+}
+export const postPurchase = async (req,res)=>{
+    try {
+        const {cid} = req.params
+        const cartManager =new CartManagerDB()
+        const productManager = new ProductManagerDB()
+        const ticketManager = new TicketManager()
+        const {user} = req.session
+        console.log(user)
+        let amount = 0
+
+        const cart = await cartManager.getCartById(cid)
+        if(!cart){
+            res.status(404).json({message: 'Cart not found'})
+        }
+        cart.rdo.products.forEach(async product => {
+            const searchedProduct = await productManager.getProductById(product.product)
+            if(searchedProduct.rdo.stock >= product.quantity){
+                let newStock = searchedProduct.rdo.stock - product.quantity
+                await productManager.updateProduct(searchedProduct.rdo._id, {stock: newStock})
+                amount += searchedProduct.rdo.price * product.quantity
+                await cartManager.deleteProductInCart(cid, product.product)
+            } 
+            
+        })
+
+        /*if(amount === 0){
+            const noStockProducts = cart.rdo.products.map(p => p.product)
+            return res.send({noStockProducts})
+        }*/
+        
+        const ticket = await ticketManager.createTicket(amount, user.email)
+        console.log(ticket)
+        return res.send({message: 'Ticket created', ticket})
+        
+    } catch (error) {
+        res.status(400).json({message: error.message})
     }
 }

@@ -8,7 +8,7 @@ export const addRegisterController = (req, res) => {
 }
 export const getCurrentUserController = (req,res)=>{
     const user = new UserDTO(req.user)
-    res.send(user.getCurrentUser)
+    res.send(user.getCurrentUser())
 }
 export const postLoginSessionController = (req, res) => {
     if(!req.user){
@@ -22,6 +22,8 @@ export const postLoginSessionController = (req, res) => {
         email: req.user.email,
         role: req.user.role
     }
+    req.session.save()
+    
     res.redirect('/')
 }
 export const postLogoutSessionController = (req, res) => {
