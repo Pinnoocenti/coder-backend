@@ -1,4 +1,7 @@
+import { addProductError } from "../../errors/info.js"
 import { productModel } from "../models/product.model.js"
+import ErrorEnum from "../../errors/error.enum.js"
+import MyError from "../../errors/myError.js"
 
 class ProductManagerDB {
     /*constructor(title, description, price, code, stock,status, category, thunbnail){
@@ -33,10 +36,16 @@ class ProductManagerDB {
         try {
             let searchedProduct = []
             
-            const validation = !product.title && !product.description && !product.price && !product.code && !product.stock && !product.category
+            const validation = (!product.title || !product.description || !product.price || !product.code || !product.stock || !product.category) || (typeof product.title !== String || typeof product.description !== String || typeof product.price !== Number || typeof product.thumbnail !== String || typeof product.code !== String|| typeof product.stock !== String|| typeof product.category !== String || typeof product.status !== String || typeof product.available !== String)
 
+        
             if (validation) {
-                return { message: 'error', rdo: 'Incomplete product' }
+                throw new MyError({
+                    name: 'Product creation fails', 
+                    cause: addProductError(validation),
+                    message: 'Error - there are incomplete fields or the data type is incorrect',
+                    code: ErrorEnum.INVALID_TYPE_ERROR,
+                })
             }
             const products = await this.getProducts()
         
@@ -51,8 +60,7 @@ class ProductManagerDB {
             const added = await productModel.create(product)
             return { message: 'The product was added'}
         } catch (error) {
-            console.log('hubo un error')
-            return { message: "error", rdo: "There was an error adding product - " + error.message }
+            throw error;
         }
     }
     async getProductById(pid) {

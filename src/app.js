@@ -5,8 +5,6 @@ import mongoose from 'mongoose'
 import productsRouter from './routes/products.routes.js'
 import cartsRouter from './routes/carts.routes.js'
 import viewsRoutes from './routes/view.routes.js'
-import ProductManagerDB from './dao/ManagerDB/productManagerDB.js'
-import CartManagerDB from './dao/ManagerDB/cartManagerDB.js'
 import session from 'express-session' 
 import MongoStore from 'connect-mongo'
 import cookieParser from 'cookie-parser'
@@ -15,11 +13,10 @@ import passport from 'passport'
 import initializePassport from './config/passport.config.js'
 import { Command } from 'commander'
 import { getVariables } from './config/config.js'
+import { errorHandler } from './middlewares/errors.js'
 
 const app = express()
 const program = new Command()
-const productManager = new ProductManagerDB()
-const cartManager = new CartManagerDB()
 
 program.option('--mode <mode>', 'Modo de trabajo', 'production')
 const options = program.parse()
@@ -59,6 +56,7 @@ app.use('/api/products', productsRouter)
 app.use('/api/carts', cartsRouter)
 app.use('/api/session', sessionRoutes)
 app.use('/', viewsRoutes)
+app.use(errorHandler)
 
 const httpServer = app.listen(port, ()=>{
     console.log(`Server on ${port}`)

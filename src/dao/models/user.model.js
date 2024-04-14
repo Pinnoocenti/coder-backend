@@ -1,4 +1,7 @@
 import mongoose from "mongoose";
+import CartManagerDB from "../ManagerDB/cartManagerDB.js";
+
+const CartManager = new CartManagerDB()
 
 const userCollection = 'users'
 
@@ -30,7 +33,6 @@ const userSchema = mongoose.Schema({
     },
     cart: {
         type: mongoose.Schema.ObjectId,
-        require: true,
         ref: 'carts'
     }
 })

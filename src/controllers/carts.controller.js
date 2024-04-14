@@ -1,53 +1,68 @@
-import CartManagerDB from "../dao/ManagerDB/cartManagerDB.js";
-import ProductManagerDB from '../dao/ManagerDB/productManagerDB.js'
-import TicketManager from "../dao/ManagerDB/ticketManagerDB.js";
+import cartDAO from "../dao/Manager/cartDAO.js"
+import productDAO from "../dao/Manager/productDAO.js"
+import ticketDAO from "../dao/Manager/ticketDAO.js"
+import userDAO from "../dao/Manager/userDAO.js"
+import MyError from "../errors/myError.js"
+import ErrorEnum from "../errors/error.enum.js"
+import { notFound } from "../errors/info.js"
 
-export const getCartsController = async (req,res)=>{
+export const getCartsController = async (req,res,next)=>{
     try {
-        const carts = new CartManagerDB()
-        const result= await carts.getCarts()
-
-        if(result.message === 'ok'){
+        const result= await cartDAO.getCarts()
+        if(result && result.length > 0){
             return res.status(200).json(result)
         }
-        res.status(400).json(result)
+        throw new MyError({
+            name: 'Cart not found', 
+            cause: notFound(),
+            message: 'Error - Cart not found',
+            code: ErrorEnum.NOT_FOUND,
+        })
     } catch (error) {
-        res.status(400).json({ message: "There was an error getting the carts" + error.menssage })
+        next(error)
     }
 }
 export const postCartController = async (req,res)=>{
     try{
-        const cart = new CartManagerDB() 
-        const result = await cart.addCart({products: []})
-        if(result.message === 'ok'){
-            return res.status(200).json(result)
-        }
-        res.status(400).json(result)
+        const result = await cartDAO.addCart({products: []})
+         return res.status(200).json(result)
     } catch (error) {
-        res.status(400).json({message: error})
+        throw error
     }
 }
-export const getCartByIdController = async (req,res)=>{
+export const getCartByIdController = async (req,res, next)=>{
     let {cid} = req.params
     try {
-        const cart = new CartManagerDB() 
-        const result = await cart.getProductsCartById(cid)
-
-        if(result.message === 'ok'){
+        const result = await cartDAO.getProductsCartById(cid)
+        if(result){
             return res.status(200).json(result)
         }
-        res.status(400).json(result)
+        throw new MyError({
+            name: 'The cart does not exist or does not have products', 
+            cause: notFound(),
+            message: 'Error - Cart not found',
+            code: ErrorEnum.NOT_FOUND,
+        })
     } catch (error) {
-        res.status(400).json({message: "The cart does not exist"})
+        next(error)
     }
 }
 export const postProductInCartController = async (req,res)=>{
     try {
-        const {cid, pid} = req.params
+        const {pid} = req.params
         const newQuantity = req.body.quantity
-        const cart = new CartManagerDB()
-
-        const result = await cart.addProducts(cid, pid, newQuantity)
+        let cart = req.session.user.cart
+        console.log('req.session.user._id ', req.session.user)
+        if(!cart) {
+            const cartAdded = await cartDAO.addCart({products: []})
+            cart = cartAdded.cart
+            console.log('cartAdded ', cart)
+            userDAO.update(req.session.user._id, {cart: cart._id})
+            req.session.user.cart = cart
+            req.session.save()
+        }
+        console.log(cart)
+        const result = await cartDAO.addProducts(cart._id, pid, newQuantity)
         if(result){
             return res.status(200).json({message: 'Product added'})
         }
@@ -56,11 +71,10 @@ export const postProductInCartController = async (req,res)=>{
         res.status(400).send({error})
     }
 }
-export const deleteProductInCartController = async (req,res)=>{
+export const deleteProductInCartController = async (req,res)=>{ //falta en fs
     const {cid, pid} = req.params
     try {
-        const cart = new CartManagerDB()
-        const result = await cart.deleteProductInCart(cid, pid)
+        const result = await cartDAO.deleteProductInCart(cid, pid)
         if(result){
             res.send({message: 'product deleted'})
         }else{
@@ -70,12 +84,12 @@ export const deleteProductInCartController = async (req,res)=>{
         res.status(400).json({message: '2 could not delete product'})
     }
 }
-export const updateCartController = async (req,res)=>{
+export const updateCartController = async (req,res)=>{ //falta en fs
     const {cid} = req.params
     const cart = req.body
-    const cartManager = new CartManagerDB()
+    
     try {
-        const result = await cartManager.updateCart(cid, cart)
+        const result = await cartDAO.updateCart(cid, cart)
         if(result.modifiedCount > 0){
             res.send({message: 'Cart updated'});
         }else{
@@ -85,12 +99,12 @@ export const updateCartController = async (req,res)=>{
         res.status(400).json({messaje: 'could not update cart'})
     }
 }
-export const updateProductInCart = async (req,res)=>{
+export const updateProductInCart = async (req,res)=>{ //falta en fs
     const {cid, pid} = req.params
     const {quantity} = req.body
     try {
-       const cartManager =  new CartManagerDB()
-       const result = await cartManager.updateProductInCart(cid, pid, quantity)
+       
+       const result = await cartDAO.updateProductInCart(cid, pid, quantity)
        if(result){
         return res.send({message: 'product updated'})
        }else{
@@ -100,11 +114,10 @@ export const updateProductInCart = async (req,res)=>{
         res.status(400).json({message:' could not updated'})
     }
 }
-export const deleteAllProductsInCartController = async (req,res)=>{
+export const deleteAllProductsInCartController = async (req,res)=>{ //falta en fs
     const {cid}= req.params
     try {
-        const cart = new CartManagerDB() 
-        const deleted = await cart.deleteAllProductsInCart(cid)
+        const deleted = await cartDAO.deleteAllProductsInCart(cid)
         if(deleted){
             res.status(200).json({message: 'products deleted'})
         } else{
@@ -114,37 +127,38 @@ export const deleteAllProductsInCartController = async (req,res)=>{
         res.status(400).json({message: error})
     }
 }
-export const postPurchase = async (req,res)=>{
+export const postPurchase = async (req,res)=>{ //falta el fs
     try {
         const {cid} = req.params
-        const cartManager =new CartManagerDB()
-        const productManager = new ProductManagerDB()
-        const ticketManager = new TicketManager()
         const {user} = req.session
         console.log(user)
         let amount = 0
+        let noStockProducts = []
 
-        const cart = await cartManager.getCartById(cid)
+        const cart = await cartDAO.getCartById(cid)
         if(!cart){
             res.status(404).json({message: 'Cart not found'})
         }
-        cart.rdo.products.forEach(async product => {
-            const searchedProduct = await productManager.getProductById(product.product)
-            if(searchedProduct.rdo.stock >= product.quantity){
-                let newStock = searchedProduct.rdo.stock - product.quantity
-                await productManager.updateProduct(searchedProduct.rdo._id, {stock: newStock})
-                amount += searchedProduct.rdo.price * product.quantity
-                await cartManager.deleteProductInCart(cid, product.product)
-            } 
-            
-        })
 
-        /*if(amount === 0){
-            const noStockProducts = cart.rdo.products.map(p => p.product)
-            return res.send({noStockProducts})
-        }*/
+        await Promise.all(
+            cart.rdo.products.map(async (product) => {
+                const searchedProduct = await productDAO.getProductById(product.product)
+                if(searchedProduct.rdo.stock >= product.quantity){
+                    let newStock = searchedProduct.rdo.stock - product.quantity
+                    await productDAO.updateProduct(searchedProduct.rdo._id, {stock: newStock})
+                    amount += searchedProduct.rdo.price * product.quantity
+                    await cartDAO.deleteProductInCart(cid, product.product)
+                } 
+                noStockProducts.push(searchedProduct)
+                await cartDAO.deleteProductInCart(cid, product.product)
+            }) 
+        )
         
-        const ticket = await ticketManager.createTicket(amount, user.email)
+        if(amount === 0){
+            return res.send({noStockProducts})
+        }
+                
+        const ticket = await ticketDAO.createTicket(amount, user.email)
         console.log(ticket)
         return res.send({message: 'Ticket created', ticket})
         

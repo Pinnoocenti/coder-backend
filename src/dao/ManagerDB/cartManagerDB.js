@@ -1,33 +1,49 @@
 import mongoose from "mongoose";
 import { cartModel } from "../models/cart.model.js";
+import MyError from "../../errors/myError.js";
+import ErrorEnum from "../../errors/error.enum.js";
+import {databaseError}  from "../../errors/info.js";
 
 
 class CartManagerDB {
     async getCarts() {
         try {
             const cartsData = await cartModel.find().lean()
-            return { message: 'ok', rdo: cartsData }
+            return cartsData;
         } catch (error) {
-            return { message: 'error', rdo: 'There are no carts' }
+            throw new MyError({
+                name: 'Unexpected database error', 
+                cause: databaseError(),
+                message: error.message,
+                code: ErrorEnum.DATABASE_ERROR,
+            })
         }
     }
     async addCart(products) {
         try {
             const cart = await cartModel.create(products)
-            return { message: 'ok', rdo: ' Cart added' }
+            return cart
         } catch (error) {
-            return { message: 'error', rdo: 'There was an error creating the cart' + error.message }
+            throw new MyError({
+                name: 'Unexpected database error', 
+                cause: databaseError(),
+                message: error.message,
+                code: ErrorEnum.DATABASE_ERROR,
+            })
         }
     }
     async getCartById(cId) {
         try {
             const cartById = await cartModel.findOne({ _id: cId })
-            if (!cartById) {
-                return { message: 'error', rdo: 'The cart does not exist' }
-            }
-            return { message: 'ok', rdo: cartById }
+            return cartById 
         } catch (error) {
-            return { message: 'error', rdo: 'There was an error getting the cart' }
+            console.error(error)
+            throw new MyError({
+                name: 'Unexpected database error', 
+                cause: databaseError(),
+                message: error.message,
+                code: ErrorEnum.DATABASE_ERROR,
+            })
         }
     }
     async addProducts(cid, pid, quantity) {
@@ -48,19 +64,20 @@ class CartManagerDB {
             return false
         }
     }
-    async getProductsCartById(cid) {
+    async getProductsCartById(cid) { //falta en fs
         try {
             const cart = await cartModel.findOne({ _id: cid }).populate('products.product')
-            if (cart) {
-                return { message: 'ok', rdo: cart.products }
-            } else {
-                return { message: 'error', rdo: 'The cart does not exist or does not have products' }
-            }
+            return cart
         } catch (error) {
-            return { message: 'error', rdo: ' There was an error getting products from cart - ' + error.message }
+            throw new MyError({
+                name: 'Unexpected database error getting products from cart', 
+                cause: databaseError(),
+                message: error.message,
+                code: ErrorEnum.DATABASE_ERROR,
+            })
         }
     }
-    async deleteAllProductsInCart(cid) {
+    async deleteAllProductsInCart(cid) { //falta en fs
         try {
             const deleted = await cartModel.updateOne({ _id: cid }, {
                 products: []
@@ -77,7 +94,7 @@ class CartManagerDB {
             return false
         }
     }
-    async deleteProductInCart(cId, pId) {
+    async deleteProductInCart(cId, pId) { //falta en fs
         try {
             const searchedCart = await cartModel.updateOne({ _id: cId }, {
                 $pull: { products: { product: new mongoose.Types.ObjectId(pId) } }
@@ -94,7 +111,7 @@ class CartManagerDB {
             return false
         }
     }
-    async updateCart(cId, cart){
+    async updateCart(cId, cart){ //falta en fs
         try {
           const searchedCart = await cartModel.updateOne({_id: cId}, cart);
           return searchedCart
@@ -103,7 +120,7 @@ class CartManagerDB {
           return error
         }
     }
-    async updateProductInCart(cid, pid, quantity){
+    async updateProductInCart(cid, pid, quantity){ //falta en fs
         if(!quantity){
           return false
         }

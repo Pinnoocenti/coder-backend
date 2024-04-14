@@ -1,9 +1,8 @@
-import ProductManagerDB from "../dao/ManagerDB/productManagerDB.js";
+import productDAO from "../dao/Manager/productDAO.js";
 
-const managerProduct = new ProductManagerDB()
 
 export const getRealtimeproductsController = async (req,res)=>{
-    const result = await managerProduct.getProducts()
+    const result = await productDAO.getProducts()
     if(result.message === 'ok'){
         res.render('realTimeProducts', {title:'realTimeProducts', data: result.rdo})
     }
@@ -11,9 +10,10 @@ export const getRealtimeproductsController = async (req,res)=>{
 export const getViewsProductsController = async (req,res)=>{
     const {page}= req.query
     const {user} = req.session
-    const products = await managerProduct.getProducts(10,page)    
+    const products = await productDAO.getProducts(10,page)    
     res.render('products', {products, user})
 }
+
 export const getRegisterController = (req,res)=>{
     res.render('register')
 }

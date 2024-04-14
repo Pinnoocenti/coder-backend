@@ -1,8 +1,7 @@
-import mongoose from "mongoose";
 import { ticketModel } from "../models/ticket.model.js";
 
 
-class TicketManager{
+class TicketManagerDB{
     async createTicket (amount, mail){
         try {
             const ticket = {}
@@ -18,4 +17,4 @@ class TicketManager{
     }
 }
 
-export default TicketManager
+export default TicketManagerDB

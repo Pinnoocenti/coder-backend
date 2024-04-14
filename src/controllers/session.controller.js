@@ -1,5 +1,3 @@
-import passport from "passport";
-import session from "express-session";
 import UserDTO from "../dao/dto/user.dto.js";
 
 
@@ -20,7 +18,9 @@ export const postLoginSessionController = (req, res) => {
         lastName: req.user.lastName,
         age: req.user.age,
         email: req.user.email,
-        role: req.user.role
+        role: req.user.role,
+        _id: req.user._id,
+        cart: req.user.cart,
     }
     req.session.save()
     
@@ -28,7 +28,8 @@ export const postLoginSessionController = (req, res) => {
 }
 export const postLogoutSessionController = (req, res) => {
     req.session.user = null
-    res.redirect('/login')
+    console.log('llego hasta aca')
+    return res.redirect('/login')
 }
 export const getGithubSessionController = (req, res) => {}
 

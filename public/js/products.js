@@ -1,10 +1,10 @@
 const btns = document.getElementsByName('addToCartButton')
-const  logoutBtn = document.getElementById('logoutBtn')
+const logoutBtn = document.getElementById('logoutBtn')
 
 
 const addProductToCart = async(pid) =>{
     try {
-        const result = await fetch(`http://localhost:8080/api/carts/660233da6e0878551c2f5e24/product/${pid}`, {
+        const result = await fetch(`http://localhost:8080/api/carts/product/${pid}`, {
         body: JSON.stringify({
             quantity: 1
         }), 

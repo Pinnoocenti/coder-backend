@@ -1,13 +1,14 @@
-import ProductManagerDB from "../dao/ManagerDB/productManagerDB.js";
 import { uploader } from "../utils/multer.js";
 import ProductDTO from "../dao/dto/product.dto.js";
+import productDAO from "../dao/Manager/productDAO.js";
+import { generateProduct } from "../utils/mock.js";
+
 
 
 export const getProductsController = async (req, res)=>{ 
     try{
         const {limit = 10, page = 1, query = '', sort = ''} = req.query
-        const products = new ProductManagerDB()
-        const result = await products.getProducts(limit, page, query, sort)
+        const result = await productDAO.getProducts(limit, page, query, sort)
         if(result){
             res.send(result)
         }else{
@@ -20,8 +21,7 @@ export const getProductsController = async (req, res)=>{
 export const getProductByIdController = async (req, res)=>{
     try {
         const {pid} = req.params
-        const product = new ProductManagerDB()
-        const result = await product.getProductById(pid)
+        const result = await productDAO.getProductById(pid)
 
         if(result.message === 'ok'){
             return res.status(200).json(result)
@@ -34,10 +34,9 @@ export const getProductByIdController = async (req, res)=>{
 export const addProductController = /*uploader.single('file'),*/ async (req,res)=>{
     try {
         const newProduct = new ProductDTO(req.body)
-        const product = new ProductManagerDB()
         //const path = req.file.path.split('public').join('')
         //await product.addProduct({...newProduct/*, thunbnail: path*/}) 
-        const result = await product.addProduct(newProduct)
+        const result = await productDAO.addProduct(newProduct)
         if(result.message==='ok'){
             return res.status(201).json({message: 'Product added'})
         }
@@ -51,9 +50,7 @@ export const updateProducstController = async (req,res)=>{
     try {
         let {pid} = req.params
         const productToModify = req.body
-        const products = new ProductManagerDB()
-        
-        const result = await products.updateProduct(pid, productToModify)
+        const result = await productDAO.updateProduct(pid, productToModify)
         if(result.message === 'ok'){
             return res.status(200).json(result)
         }
@@ -66,8 +63,7 @@ export const updateProducstController = async (req,res)=>{
 export const deleteProductController = async (req, res)=>{
     let {pid} = req.params
     try {
-        const product = new ProductManagerDB()
-        const deleted = await product.deleteProduct(pid)
+        const deleted = await productDAO.deleteProduct(pid)
         if (deleted.message==='ok'){
             return res.status(200).json(deleted.rdo)
         }
@@ -75,4 +71,11 @@ export const deleteProductController = async (req, res)=>{
     } catch (error) {
         res.status(400).json({message: 'eror'})
     }
+}
+export const getMockingProducts = (req,res) =>{
+    const products = []
+    for(let i= 0; i <100; i++){
+        products.push(generateProduct()) 
+    }
+    res.send(products)
 }
