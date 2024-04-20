@@ -14,9 +14,12 @@ import initializePassport from './config/passport.config.js'
 import { Command } from 'commander'
 import { getVariables } from './config/config.js'
 import { errorHandler } from './middlewares/errors.js'
+import {logger} from './utils/logger.js'
 
 const app = express()
 const program = new Command()
+
+app.use(logger)
 
 program.option('--mode <mode>', 'Modo de trabajo', 'production')
 const options = program.parse()
@@ -56,6 +59,18 @@ app.use('/api/products', productsRouter)
 app.use('/api/carts', cartsRouter)
 app.use('/api/session', sessionRoutes)
 app.use('/', viewsRoutes)
+
+//enpoint para el logger test para tutor 
+app.get('/loggerTest', (req,res) =>{
+    req.logger.debug('Esto es un debug')
+    req.logger.http('Esto es un http')
+    req.logger.info('Esto es info')
+    req.logger.warning('Esto es un warning')
+    req.logger.error('Esto es un error')
+    req.logger.fatal('Esto es un fatal')
+    res.send({message: 'Logger de prueba'})
+    
+})
 app.use(errorHandler)
 
 const httpServer = app.listen(port, ()=>{
