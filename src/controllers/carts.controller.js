@@ -50,12 +50,12 @@ export const getCartByIdController = async (req,res, next)=>{
 export const postProductInCartController = async (req,res)=>{
     try {
         const {pid} = req.params
-        const newQuantity = req.body.quantity
+        const newQuantity = req.body.quantity ?? 1
         let cart = req.session.user.cart
         console.log('req.session.user._id ', req.session.user)
         if(!cart) {
             const cartAdded = await cartDAO.addCart({products: []})
-            cart = cartAdded.cart
+            cart = cartAdded
             console.log('cartAdded ', cart)
             userDAO.update(req.session.user._id, {cart: cart._id})
             req.session.user.cart = cart
@@ -141,7 +141,7 @@ export const postPurchase = async (req,res)=>{ //falta el fs
         }
 
         await Promise.all(
-            cart.rdo.products.map(async (product) => {
+            cart.products.map(async (product) => {
                 const searchedProduct = await productDAO.getProductById(product.product)
                 if(searchedProduct.rdo.stock >= product.quantity){
                     let newStock = searchedProduct.rdo.stock - product.quantity

@@ -77,9 +77,20 @@ const httpServer = app.listen(port, ()=>{
     console.log(`Server on ${port}`)
 })
 
-const socketServer = new Server(httpServer)
-socketServer.on('connection', (socket)=>{
+const io = new Server(httpServer)
+
+const messages= []
+
+io.on('connect', socket=>{
     console.log('New client connected')
+    socket.on('message', data =>{
+        messages.push(data)
+        io.emit('messageLogs', messages)
+    })
+    socket.on('newUser', user =>{
+        io.emit('newConnection', 'A new user is conect')
+        socket.broadcast.emit('notification', user)
+    })
 })
 
-export { socketServer }
+export { io }

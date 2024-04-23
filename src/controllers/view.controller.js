@@ -33,3 +33,6 @@ export const getFailRegisterController = (req, res)=>{
 export const getUserCreateSuccessController = (req,res)=>{
     res.render('userCreateSuccess')
 }
+export const getChat = (req,res)=>{
+    res.render('chat')
+}
