@@ -15,6 +15,7 @@ import { Command } from 'commander'
 import { getVariables } from './config/config.js'
 import { errorHandler } from './middlewares/errors.js'
 import {logger} from './utils/logger.js'
+import userRoutes from './routes/users.routes.js'
 
 const app = express()
 const program = new Command()
@@ -58,6 +59,7 @@ app.set('view engine', 'handlebars')
 app.use('/api/products', productsRouter)
 app.use('/api/carts', cartsRouter)
 app.use('/api/session', sessionRoutes)
+app.use('/api/users', userRoutes)
 app.use('/', viewsRoutes)
 
 //enpoint para el logger test para tutor 
@@ -79,10 +81,12 @@ const httpServer = app.listen(port, ()=>{
 
 const io = new Server(httpServer)
 
-const messages= []
+let messages= []
 
 io.on('connect', socket=>{
     console.log('New client connected')
+
+    socket.emit('messageLogs', messages)
     socket.on('message', data =>{
         messages.push(data)
         io.emit('messageLogs', messages)

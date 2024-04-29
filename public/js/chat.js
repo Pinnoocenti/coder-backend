@@ -15,6 +15,14 @@ Swal.fire({
     socket.emit('newUser', userName);
 });
 
+socket.on('messageLogs', data => {
+    let messages = '';
+    data.forEach(message => {
+        messages += `${message.user} dice: ${message.data} <br />`;
+    });
+    outputData.innerHTML = messages;
+});
+
 const inputData = document.getElementById('inputData');
 const outputData = document.getElementById('outputData');
 
@@ -25,19 +33,11 @@ inputData.addEventListener('keyup', (event) => {
             inputData.value = ''
         }
     }
-});
-
-socket.on('messageLogs', data => {
-    let messages = '';
-    data.forEach(message => {
-        messages+=`${message.user} dice: ${message.data} <br />`
-    });
-    outputData.innerHTML = messages;
-});
+})
 
 socket.on('newConnection', data => {
     console.log(data);
-});
+})
 
 socket.on('notification', user => {
     Swal.fire({

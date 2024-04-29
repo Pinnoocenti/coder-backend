@@ -7,42 +7,45 @@ const productCollection = 'products'
 const productSchema = mongoose.Schema({
     title:{
         type: String,
-        required: true 
+        required: true, 
     }, 
     description:{
         type: String,
-        required: true 
+        required: true, 
     },
     price:{
         type: Number,
-        required: true 
+        required: true,
     },
     thumbnail:{
-        type: String
+        type: String,
     },
     code:{
         type: String,
         required: true,
-        unique: true
+        unique: true,
     },
     stock:{
         type: String,
-        required: true 
+        required: true, 
     }, 
     category:{
         type: String,
-        required: true 
+        required: true,
     },
     status:{
         type: String,
-        default: true
-        
+        default: true,
     },
     available:{
         type: String,
         enum: ['si', 'no'],
-        required: true
-    }
+        required: true,
+    },
+    owner: {
+        type: String,
+        default: 'admin',
+    },
 })
 productSchema.plugin(mongoosePaginate)
 

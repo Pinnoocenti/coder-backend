@@ -1,5 +1,12 @@
 import productDAO from "../dao/Manager/productDAO.js";
+import jwt from 'jsonwebtoken'
+import { getVariables } from "../config/config.js";
+import { Command } from 'commander'
 
+const program = new Command()
+const options = program.parse()
+
+const { secretPassword} = getVariables(options)
 
 export const getRealtimeproductsController = async (req,res)=>{
     const result = await productDAO.getProducts()
@@ -35,4 +42,26 @@ export const getUserCreateSuccessController = (req,res)=>{
 }
 export const getChat = (req,res)=>{
     res.render('chat')
+}
+export const getResetPassword = (req,res)=>{
+    res.render('resetpassword')
+}
+export const getFailemail = (req,res)=>{
+    res.render('failemail')
+}
+export const getChangePassword = (req,res)=>{
+    const token = req.query.token
+    if(!token){
+        return res.render('expiredlink')
+    }   
+    try {
+        const decoded = jwt.verify(token, secretPassword);
+        res.render('changepassword');
+
+    } catch (error) {
+        return res.render('expiredlink')
+    }
+}
+export const getExpiredlink = (req,res)=>{
+    res.render('expiredlink')
 }

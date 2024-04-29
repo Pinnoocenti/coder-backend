@@ -5,10 +5,10 @@ import { addProductController, deleteProductController, getProductByIdController
 const productsRouter = Router()
 
 productsRouter.get('/mockingproducts', getMockingProducts )
-productsRouter.get('/', authorization('user'),checkExistingUser, getProductsController)
-productsRouter.get('/:pid', authorization('user'), getProductByIdController)
-productsRouter.post('/', authorization('admin'),addProductController)
-productsRouter.put('/:pid', authorization('admin'),updateProducstController)
-productsRouter.delete('/:pid', authorization('admin'),deleteProductController)
+productsRouter.get('/', authorization(['user']),checkExistingUser, getProductsController)
+productsRouter.get('/:pid', authorization(['user']), getProductByIdController)
+productsRouter.post('/', authorization(['admin','premium']),addProductController)
+productsRouter.put('/:pid', authorization(['admin','premium']),updateProducstController)
+productsRouter.delete('/:pid', authorization(['admin','premium']),deleteProductController)
 
 export default productsRouter

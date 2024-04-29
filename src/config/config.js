@@ -11,6 +11,9 @@ export const getVariables = (options) =>{
         mongoURL: process.env.MONGO_URL,
         secretPassword: process.env.SECRET_PASSWORD,
         userAdmin: process.env.USER_ADMIN,
-        passAdmin: process.env.PASSADMIN
+        passAdmin: process.env.PASSADMIN,
+        userMailing: process.env.MAILING_USER,
+        service: process.env.MAILING_SERVICE,
+        passwordMailing: process.env.MAILING_PASSWORD,
     }
 }

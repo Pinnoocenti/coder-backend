@@ -16,7 +16,8 @@ const addProductToCart = async(pid) =>{
     if(result.status===200 || result.status===201){
         alert('Se agrego correctamente')
     } else{
-        alert('error, no se pudo agregar ')
+        const data = await result.json();
+        alert(data.message ?? 'Error, no se pudo agregar')
     }
     } catch (error) {
         alert('Error, no se pudo agregar');

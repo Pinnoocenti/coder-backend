@@ -20,11 +20,6 @@ const initializePassport = () => {
             console.log(username)
             let role
             try {
-                /*const existingUser = await userDAO.getUserByEmail(email)
-                if(existingUser){
-                    console.log('User already exist')
-                    return done(null, false)
-                }*/
                 if(email === 'adminCoder@coder.com'){
                     role = 'admin'
                 } else{
@@ -54,7 +49,7 @@ const initializePassport = () => {
         { usernameField: 'email' },
         async (username, password, done) => {
             try {
-                const { user } = await userDAO.getUserByEmail({email: username})
+                const { user } = await userDAO.getUserByEmail(username)
                 if (!user || !isValidPassword(user, password)) {
                     return done(null, false)
                 }
@@ -64,6 +59,7 @@ const initializePassport = () => {
             }
         }
     ))
+   
 
     passport.use('github', new GithubStrategy(
         {

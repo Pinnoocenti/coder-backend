@@ -4,16 +4,6 @@ import ErrorEnum from "../../errors/error.enum.js"
 import MyError from "../../errors/myError.js"
 
 class ProductManagerDB {
-    /*constructor(title, description, price, code, stock,status, category, thunbnail){
-        this.title= title
-        this.description = description
-        this.price = price
-        this.code = code
-        this.stock = stock
-        this.status = status
-        this.category = category
-        this.thunbnail = thunbnail
-    }*/
     async getProducts(limit = 10, page = 1, query = '', sort = '') {
         try {
 
@@ -35,10 +25,10 @@ class ProductManagerDB {
     async addProduct(product) {
         try {
             let searchedProduct = []
+            console.log(product)
             
-            const validation = (!product.title || !product.description || !product.price || !product.code || !product.stock || !product.category) || (typeof product.title !== String || typeof product.description !== String || typeof product.price !== Number || typeof product.thumbnail !== String || typeof product.code !== String|| typeof product.stock !== String|| typeof product.category !== String || typeof product.status !== String || typeof product.available !== String)
+            const validation = (!product.title || !product.description || !product.price || !product.code || !product.stock || !product.category) || (typeof product.title !== 'string' || typeof product.description !== 'string' || typeof product.price !== 'number' /*|| typeof product.thumbnail !== String*/ || typeof product.code !== 'string'|| typeof product.stock !== 'string'|| typeof product.category !== 'string' || typeof product.status !== 'string' || typeof product.available !== 'string')
 
-        
             if (validation) {
                 throw new MyError({
                     name: 'Product creation fails', 
@@ -57,6 +47,7 @@ class ProductManagerDB {
             if (searchedProduct) {
                 return { message: 'error', rdo: 'The product code already exists' };
             }
+        
             const added = await productModel.create(product)
             return { message: 'The product was added'}
         } catch (error) {
