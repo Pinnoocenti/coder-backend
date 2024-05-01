@@ -5,8 +5,8 @@ class TicketManagerDB{
     async createTicket (amount, mail){
         try {
             const ticket = {}
-            ticket.code = new Date() + Math.floor(Math.random() * 10000)
             ticket.purchaseDateTime = new Date() 
+            ticket.code = ticket.purchaseDateTime.getMilliseconds() + Math.floor(Math.random() * 10000)
             ticket.amount = amount
             ticket.purchaser = mail
             const result = await ticketModel.create(ticket)

@@ -1,0 +1,245 @@
+paths: 
+  /api/products:
+    get:
+      summary: Obtiene todos los productos
+      tags:
+        - Products
+      responses:
+        "200":
+          description: Los productos se han obtenido satisfactoriamente
+          content: 
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/products'
+        "500": 
+          description: Error del servidor
+    post:
+      summary: Agrega un producto nuevo
+      tags:
+        - Products
+      requestBody:
+        required: true
+        content: 
+          application/json:
+              schema:
+                $ref: '#components/requestBodies/newProduct'
+      responses:
+        "201":
+          description: El producto se ha creado satisfactoriamente
+          content: 
+            application/json:
+              schema:
+                  $ref: '#components/schemas/products'
+        "500": 
+          description: Error del servidor
+  /api/products/{pid}:
+    get:
+      summary: Obtiene un producto en particular por su id
+      tags:
+        - Products
+      parameters:
+        - name: pid
+          in: path
+          description: Id del producto a encontrar
+          schema: 
+            type: ObjectId
+      responses:
+        "200":
+          description: El producto se ha encontrado satisfactoriamente
+          content: 
+            application/json:
+              schema:
+                $ref: '#components/schemas/products'
+        "500": 
+          description: Error del servidor
+        "404":
+          description: Producto no encontrado
+    put: 
+      summary: Actualiza un producto buscandolo por su id
+      tags: 
+        - Products
+      parameters:
+        - name: pid
+          in: path
+          description: Id del producto a modificar
+          schema: 
+            type: String
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#components/requestBodies/updateProduct'
+      responses:
+        "200":
+          description: El producto se ha modificado satisfactoriamente
+          content: 
+            application/json:
+              schema:
+                $ref: '#components/schemas/products'
+        "500": 
+          description: Error del servidor
+        "404":
+          description: Producto no encontrado
+    delete:
+      summary: Elimina un producto buscandolo por su id
+      tags: 
+        - Products
+      parameters:
+        - name: pid
+          in: path
+          description: Id del producto a eliminar
+          schema: 
+            type: String
+      responses:
+        "200":
+          description: El producto se ha eliminado
+        "500": 
+          description: Error del servidor
+        "404":
+          description: Producto no encontrado
+
+components: 
+  schemas:
+    products:
+      type: object
+      properties:
+        _id:
+          type: ObjectId
+          description: Id autogenerado por mongo
+        title: 
+          type: string
+          description: Titulo del producto
+        description: 
+          type: string 
+          description: Descripción del producto 
+        price: 
+          type: number
+          description: Precio del producto 
+        thumbnail:
+          type: string
+          description: Imagen del producto 
+        code:
+          type: string
+          description: Código del producto (es único)
+        stock:
+          type: string
+          description: Cantidad de unidades disponibles del producto
+        category:
+          type: string
+          description: En qué subgrupo esta el producto
+        status: 
+          type: boolean
+          description: Estado del producto
+        available:
+          type: string
+          description: Si el producto esta disponible o no 
+        owner: 
+          type: string
+          description: Vendedor del producto
+      example: 
+        _id: ObjectId('65e9cd7a52852859084adbb3')
+        title: "Producto 1"
+        description: "descripción producto 1"
+        price: 3500
+        thumbnail: ""
+        code: "abc8588"
+        stock: "25"
+        category: "Abrigo"
+        status: "true"
+        available: "true"
+        owner: "admin"
+  requestBodies:
+    newProduct:
+      type: object
+      properties: 
+        title: 
+          type: string
+          description: Titulo del producto
+        description: 
+          type: string 
+          description: Descripción del producto 
+        price: 
+          type: number
+          description: Precio del producto 
+        thumbnail:
+          type: string
+          description: Imagen del producto 
+        code:
+          type: string
+          description: Código del producto (es único)
+        stock:
+          type: string
+          description: Cantidad de unidades disponibles del producto
+        category:
+          type: string
+          description: En qué subgrupo esta el producto
+        status: 
+          type: boolean
+          description: Estado del producto
+        available:
+          type: string
+          description: Si el producto esta disponible o no 
+        owner: 
+          type: string
+          description: Vendedor del producto
+      example: 
+        title: "Producto 1"
+        description: "descripción producto 1"
+        price: 3500
+        thumbnail: ""
+        code: "abc8588"
+        stock: "25"
+        category: "Abrigo"
+        status: "true"
+        available: "true"
+        owner: "pinn@gmail.com"
+    updateProduct:
+      type: object
+      properties: 
+        title: 
+          type: string
+          description: Titulo del producto
+        description: 
+          type: string 
+          description: Descripción del producto 
+        price: 
+          type: number
+          description: Precio del producto 
+        thumbnail:
+          type: string
+          description: Imagen del producto 
+        code:
+          type: string
+          description: Código del producto (es único)
+        stock:
+          type: string
+          description: Cantidad de unidades disponibles del producto
+        category:
+          type: string
+          description: En qué subgrupo esta el producto
+        status: 
+          type: boolean
+          description: Estado del producto
+        available:
+          type: string
+          description: Si el producto esta disponible o no 
+        owner: 
+          type: string
+          description: Vendedor del producto
+      example: 
+        title: "Producto 1"
+        description: "descripción producto 1"
+        price: 3500
+        thumbnail: ""
+        code: "abc8588"
+        stock: "25"
+        category: "Abrigo"
+        status: "true"
+        available: "true"
+        owner: "pinn@gmail.com"
+
+
+

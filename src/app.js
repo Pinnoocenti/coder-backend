@@ -1,21 +1,27 @@
 import express from 'express'
 import handlebars from 'express-handlebars'
-import { Server } from 'socket.io'
 import mongoose from 'mongoose'
+import cookieParser from 'cookie-parser'
+import { Server } from 'socket.io'
+import session from 'express-session' 
+import MongoStore from 'connect-mongo'
+import swaggerJSDoc from 'swagger-jsdoc'
+import swaggerUIExpress from 'swagger-ui-express'
+
 import productsRouter from './routes/products.routes.js'
 import cartsRouter from './routes/carts.routes.js'
 import viewsRoutes from './routes/view.routes.js'
-import session from 'express-session' 
-import MongoStore from 'connect-mongo'
-import cookieParser from 'cookie-parser'
 import sessionRoutes from './routes/session.routes.js'
+import userRoutes from './routes/users.routes.js'
+
 import passport from 'passport'
 import initializePassport from './config/passport.config.js'
 import { Command } from 'commander'
 import { getVariables } from './config/config.js'
 import { errorHandler } from './middlewares/errors.js'
 import {logger} from './utils/logger.js'
-import userRoutes from './routes/users.routes.js'
+import {swaggerConfiguration} from './utils/swagger.js'
+
 
 const app = express()
 const program = new Command()
@@ -25,6 +31,10 @@ app.use(logger)
 program.option('--mode <mode>', 'Modo de trabajo', 'production')
 const options = program.parse()
 const { port,secretPassword, mongoURL} = getVariables(options)
+
+//SWAGGER
+const specs = swaggerJSDoc(swaggerConfiguration)
+app.use('/apidocs', swaggerUIExpress.serve, swaggerUIExpress.setup(specs))
 
 app.use(express.json())
 app.use(express.urlencoded({extended:true}))
@@ -41,6 +51,7 @@ app.use(session({
     saveUninitialized: true,
 }))
 
+//PASSPORT
 initializePassport()
 app.use(passport.initialize())
 app.use(passport.session())
@@ -56,6 +67,7 @@ app.engine('handlebars', hbs.engine)
 app.set('views', 'src/views')
 app.set('view engine', 'handlebars')
 
+//RUTAS
 app.use('/api/products', productsRouter)
 app.use('/api/carts', cartsRouter)
 app.use('/api/session', sessionRoutes)
@@ -71,7 +83,6 @@ app.get('/loggerTest', (req,res) =>{
     req.logger.error('Esto es un error')
     req.logger.fatal('Esto es un fatal')
     res.send({message: 'Logger de prueba'})
-    
 })
 app.use(errorHandler)
 
@@ -79,6 +90,7 @@ const httpServer = app.listen(port, ()=>{
     console.log(`Server on ${port}`)
 })
 
+//SOCKET IO
 const io = new Server(httpServer)
 
 let messages= []
