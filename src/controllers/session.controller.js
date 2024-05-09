@@ -36,7 +36,7 @@ export const postLogoutSessionController = (req, res) => {
     res.redirect('/login')
 }
 export const sendEmailToResetPassword = async (req,res)=>{
-    const email = req.body.email
+    const {email} = req.body
     console.log(email)
     try {
         const user = await userDAO.getUserByEmail(email)
@@ -44,17 +44,17 @@ export const sendEmailToResetPassword = async (req,res)=>{
         if(!user){
             return res.redirect('/failemail')
         }
-        console.log(user.user.email)
+        console.log(user.email)
         const resetToken = generateResetPasswordToken()
         const resetLink = `http://localhost:8080/changepassword?token=${resetToken}`
         const mailingService = new MailingService()
         
         await mailingService.sendSimpleMail({
             from: 'Coder Ecommerce',
-            to: user.user.email,
+            to: user.email,
             subject: 'Reestablecer contraseña',
             html: `
-                <h2>Hola ${user.user.firstName} !</h2>
+                <h2>Hola ${user.firstName} !</h2>
                 <h3>¿Olvidaste tu clave?</h3>
                 <h3>Toca en continuar para modificarla</h3>
                 <button><a href=${resetLink}>Continuar</a></button>
@@ -64,12 +64,13 @@ export const sendEmailToResetPassword = async (req,res)=>{
 
     } catch (error) {
         console.log(error)
+        res.status(500)
     }
 }
 export const changePassword = async (req,res) =>{
     const {email, password} = req.body
     try {
-        const { user } = await userDAO.getUserByEmail(email)
+        const user = await userDAO.getUserByEmail(email)
         await userDAO.update(user._id, {password: createHash(password)})
 
         return res.send({message: 'Password reseted successful'})

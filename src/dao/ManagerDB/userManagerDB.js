@@ -21,24 +21,24 @@ class UserManagerDB{
     }
     async getUserByEmail (uemail) {
         try {
+            return await userModel.findOne({email: uemail}).populate('cart')
 
-            const user = await userModel.findOne({email: uemail}).populate('cart')
-            if (user) {
-                return { message: "ok", user }
-            } else {
-                return { message: "error - The user does not exist"}
-            }
         } catch (error) {
-            return { message: "error", rdo: " There was an error when obtaining the user" + error.message }
+            throw error;
         }
     }
     async getUserById (uid) {
         try {
             const user = await userModel.findOne({ _id: uid })
             if (user) {
-                return { message: "ok", rdo: user }
+                return user
             } else {
-                return { message: "error - The user does not exist"}
+                throw new MyError({
+                    name: 'User not found', 
+                    cause: databaseError(),
+                    message: 'Error - The user does not exist',
+                    code: ErrorEnum.NOT_FOUND,
+                })
             }
         } catch (error) {
             return { message: "error", rdo: " There was an error when obtaining the user" + error.message }
@@ -58,6 +58,16 @@ class UserManagerDB{
                 code: ErrorEnum.DATABASE_ERROR,
             })
         } catch (error) {
+            throw error
+        }
+    }
+    async deleteUser(uemail) {
+        try {
+            console.log({uemail})
+           return await userModel.deleteOne({ email: uemail })
+
+        } catch (error) {
+            console.log(error)
             throw error
         }
     }

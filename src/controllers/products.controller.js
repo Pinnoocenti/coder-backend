@@ -24,10 +24,10 @@ export const getProductByIdController = async (req, res) => {
         const { pid } = req.params
         const result = await productDAO.getProductById(pid)
 
-        if (result.message === 'ok') {
+        if (result) {
             return res.status(200).json(result)
         }
-        res.send(product)
+        res.send(result.message)
     } catch (error) {
         res.status(400).json({ message: 'The products does not exist' })
     }
@@ -38,14 +38,15 @@ export const addProductController = /*uploader.single('file'),*/ async (req, res
         //const path = req.file.path.split('public').join('')
         //await product.addProduct({...newProduct/*, thunbnail: path*/})
         let role = req.session.user.role
+        console.log(role)
         if (role === 'premium') {
             newProduct.owner = req.session.user.email
         }
         const result = await productDAO.addProduct(newProduct)
-        if (result.message === 'ok') {
-            return res.status(201).json({ message: 'Product added' })
+        if (result) {
+            return res.status(201).json(result)
         }
-        res.status(400).json(result)
+        res.status(400).json(result.message)
     } catch (error) {
         res.status(400).send(error)
     }

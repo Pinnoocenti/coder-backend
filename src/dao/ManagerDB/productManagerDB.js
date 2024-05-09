@@ -25,10 +25,10 @@ class ProductManagerDB {
     async addProduct(product) {
         try {
             let searchedProduct = []
-            console.log(product)
             
+            console.log(product)
             const validation = (!product.title || !product.description || !product.price || !product.code || !product.stock || !product.category) || (typeof product.title !== 'string' || typeof product.description !== 'string' || typeof product.price !== 'number' /*|| typeof product.thumbnail !== String*/ || typeof product.code !== 'string'|| typeof product.stock !== 'string'|| typeof product.category !== 'string' || typeof product.status !== 'string' || typeof product.available !== 'string')
-
+            
             if (validation) {
                 throw new MyError({
                     name: 'Product creation fails', 
@@ -48,9 +48,11 @@ class ProductManagerDB {
                 return { message: 'error', rdo: 'The product code already exists' };
             }
         
-            const added = await productModel.create(product)
-            return { message: 'The product was added'}
+            const addedProduct = await productModel.create(product)
+            console.log(addedProduct)
+            return addedProduct
         } catch (error) {
+            console.log(error)
             throw error;
         }
     }
@@ -59,9 +61,9 @@ class ProductManagerDB {
             const product = await productModel.findOne({ _id: pid })
             
             if (product) {
-                return { message: "ok", rdo: product }
+                return product
             } else {
-                return { message: "error", rdo: "The product does not exist" }
+                return { message: "error - The product does not exist"}
             }
         } catch (error) {
             return { message: "error", rdo: " There was an error when obtaining the product " + error.message }
@@ -85,7 +87,7 @@ class ProductManagerDB {
             const deleted = await productModel.deleteOne({ _id: pid })
 
             if (deleted.deletedCount === 0) {
-                return { message: 'error', rdo: 'Tthe product was not found' }
+                return { message: 'error', rdo: 'The product was not found' }
             }
 
             return { message: 'ok', rdo: 'Product deleted' }

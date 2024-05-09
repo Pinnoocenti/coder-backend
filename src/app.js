@@ -30,7 +30,7 @@ app.use(logger)
 
 program.option('--mode <mode>', 'Modo de trabajo', 'production')
 const options = program.parse()
-const { port,secretPassword, mongoURL} = getVariables(options)
+const { port,secretPassword, mongoURL, mongo_URL_test} = getVariables(options)
 
 //SWAGGER
 const specs = swaggerJSDoc(swaggerConfiguration)

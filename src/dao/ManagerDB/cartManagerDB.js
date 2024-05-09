@@ -47,6 +47,7 @@ class CartManagerDB {
         }
     }
     async addProducts(cid, pid, quantity) {
+        
         try {
             const cart = await cartModel.findOne({ _id: cid })
             if (!cart) {

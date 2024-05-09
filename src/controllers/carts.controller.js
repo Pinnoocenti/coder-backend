@@ -49,6 +49,7 @@ export const getCartByIdController = async (req,res, next)=>{
 }
 export const postProductInCartController = async (req,res)=>{
     try {
+        console.log('holaaaa')
         const {pid} = req.params
         let role = req.session.user.role
         let email = req.session.user.email
@@ -76,7 +77,7 @@ export const postProductInCartController = async (req,res)=>{
         console.log(cart)
         const result = await cartDAO.addProducts(cart._id, pid, newQuantity)
         if(result){
-            return res.status(200).json({message: 'Product added'})
+            return res.status(200).json({result, cartId:cart._id})
         }
         res.status(400).json({message: 'could not add product'})
     } catch (error) {
@@ -143,7 +144,7 @@ export const postPurchase = async (req,res)=>{ //falta el fs
     try {
         const {cid} = req.params
         const {user} = req.session
-        console.log(user)
+        console.log('user:', user)
         let amount = 0
         let noStockProducts = []
 
@@ -155,10 +156,10 @@ export const postPurchase = async (req,res)=>{ //falta el fs
         await Promise.all(
             cart.products.map(async (product) => {
                 const searchedProduct = await productDAO.getProductById(product.product)
-                if(searchedProduct.rdo.stock >= product.quantity){
-                    let newStock = searchedProduct.rdo.stock - product.quantity
-                    await productDAO.updateProduct(searchedProduct.rdo._id, {stock: newStock})
-                    amount += searchedProduct.rdo.price * product.quantity
+                if(searchedProduct.stock >= product.quantity){
+                    let newStock = searchedProduct.stock - product.quantity
+                    await productDAO.updateProduct(searchedProduct._id, {stock: newStock})
+                    amount += searchedProduct.price * product.quantity
                     await cartDAO.deleteProductInCart(cid, product.product)
                 } 
                 noStockProducts.push(searchedProduct)

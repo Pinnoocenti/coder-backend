@@ -49,7 +49,7 @@ const initializePassport = () => {
         { usernameField: 'email' },
         async (username, password, done) => {
             try {
-                const { user } = await userDAO.getUserByEmail(username)
+                const user = await userDAO.getUserByEmail(username)
                 if (!user || !isValidPassword(user, password)) {
                     return done(null, false)
                 }
