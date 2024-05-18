@@ -52,7 +52,7 @@ class UserManagerDB{
                 return updateUser
             }
             throw new MyError({
-                name: 'The password was not updated', 
+                name: 'The user was not updated', 
                 cause: databaseError(),
                 message: 'Error ',
                 code: ErrorEnum.DATABASE_ERROR,

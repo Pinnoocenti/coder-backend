@@ -12,10 +12,11 @@ export const getCurrentUserController = (req,res)=>{
     const user = new UserDTO(req.user)
     res.send(user.getCurrentUser())
 }
-export const postLoginSessionController = (req, res) => {
+export const postLoginSessionController = async (req, res) => {
     if(!req.user){
         return res.status(400).send({ message: 'Error with credentials' })
     }
+    const uid = req.user._id
 
     req.session.user = {
         firstName: req.user.firstName,
@@ -27,11 +28,14 @@ export const postLoginSessionController = (req, res) => {
         cart: req.user.cart,
     }
     req.session.save()
+    await userDAO.update(uid, {last_connection: `login ${new Date().toLocaleTimeString()}`})
     
     res.redirect('/')
 }
-export const postLogoutSessionController = (req, res) => {
+export const postLogoutSessionController = async (req, res) => {
+    const uid = req.user._id
     req.session.user = null
+    await userDAO.update(uid, {last_connection: `logout ${new Date().toLocaleTimeString()}`})
     console.log('llego hasta aca')
     res.redirect('/login')
 }

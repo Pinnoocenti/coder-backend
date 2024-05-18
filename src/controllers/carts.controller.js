@@ -49,7 +49,6 @@ export const getCartByIdController = async (req,res, next)=>{
 }
 export const postProductInCartController = async (req,res)=>{
     try {
-        console.log('holaaaa')
         const {pid} = req.params
         let role = req.session.user.role
         let email = req.session.user.email
@@ -58,8 +57,8 @@ export const postProductInCartController = async (req,res)=>{
         if(role === 'premium'){
             const product = await productDAO.getProductById(pid)
             console.log(product)
-            console.log(product.rdo.owner)
-            if(product.rdo.owner === email){
+            console.log(product.owner)
+            if(product.owner === email){
                 return res.status(400).send({message: 'You can not add this product because you are the owner'})
             }
         }

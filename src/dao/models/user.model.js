@@ -34,8 +34,16 @@ const userSchema = mongoose.Schema({
     },
     cart: {
         type: mongoose.Schema.ObjectId,
-        ref: 'carts'
-    }
+        ref: 'carts',
+    },
+    documents: [
+        {
+            name: String,
+            reference: String,
+        }
+    ],
+    
+    last_connection: String,
 })
 
 export const userModel = mongoose.model(userCollection, userSchema)

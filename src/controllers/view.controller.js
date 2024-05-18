@@ -2,6 +2,7 @@ import productDAO from "../dao/Manager/productDAO.js";
 import jwt from 'jsonwebtoken'
 import { getVariables } from "../config/config.js";
 import { Command } from 'commander'
+import { use } from "chai";
 
 const program = new Command()
 const options = program.parse()
@@ -64,4 +65,9 @@ export const getChangePassword = (req,res)=>{
 }
 export const getExpiredlink = (req,res)=>{
     res.render('expiredlink')
+}
+export const getUpload = (req,res)=>{
+    const {user} = req.session
+    console.log(user)
+    res.render('uploadDocument', {user})
 }

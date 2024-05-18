@@ -1,0 +1,8 @@
+<h2>Subir documentación</h2>
+
+<form action="/api/users/{{user._id}}/documents" method="post" enctype="multipart/form-data">
+    <label >Identificación</label><input type="file" name="identification"> <br><br>
+    <label >Comprobante de domicilio</label><input type="file" name="address"> <br><br>
+    <label >Comprobante de estado de cuenta</label><input type="file" name="accountStatus"> <br><br>
+    <button type="submit">Subir</button> 
+</form>
