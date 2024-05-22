@@ -32,7 +32,7 @@ app.use(logger)
 //program.option('--mode <mode>', 'Modo de trabajo', 'production')
 const options = program.parse()
 const { port,secretPassword, mongoURL} = getVariables(options)
-
+options.mode === 'production' ? '--omit=dev' : '--dev'
 //SWAGGER
 const specs = swaggerJSDoc(swaggerConfiguration)
 app.use('/apidocs', swaggerUIExpress.serve, swaggerUIExpress.setup(specs))
