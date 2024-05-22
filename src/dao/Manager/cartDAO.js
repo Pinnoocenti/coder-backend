@@ -1,5 +1,5 @@
 import CartManagerDB from "../ManagerDB/cartManagerDB.js";
-import CartManager from "../ManagerFS/cartManager.js"
+import CartManager from "../ManagerFS/cartManager.js";
 
 let cartDAO 
 
