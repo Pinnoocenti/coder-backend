@@ -7,6 +7,8 @@ const options = program.parse()
 
 
 const { userMailing, service, passwordMailing} = getVariables(options)
+console.log({userMailing})
+console.log({passwordMailing})
 
 export default class MailingService {
     constructor(){
