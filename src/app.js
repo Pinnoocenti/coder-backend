@@ -29,7 +29,7 @@ const program = new Command()
 
 app.use(logger)
 
-program.option('--mode <mode>', 'Modo de trabajo', 'production')
+//program.option('--mode <mode>', 'Modo de trabajo', 'production')
 const options = program.parse()
 const { port,secretPassword, mongoURL} = getVariables(options)
 
