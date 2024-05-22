@@ -7,7 +7,9 @@
         <p>Producto: {{this._id}}</p>
         <p>Producto: {{this.title}}</p>
         <p>Descripción: {{this.description}}</p>
-        <img width='150px' src="{{this.thumbnail}}" alt="{{this.title}}">
+        {{#if this.thumbnail}}
+            <img width='150px' src="{{this.thumbnail}}" alt="{{this.title}}">
+        {{/if}}
         <p>Precio: {{this.price}}</p>
         <p>Código: {{this.code}}</p>
         <p>Stock: {{this.stock}}</p>
