@@ -44,7 +44,6 @@ export const uploadDocument = async (req, res) => {
     if (!req.files) {
         return res.status(400).send({ message: 'Error - the document could not be saved' })
     }
-    req.logger.info(req.files)
     const { user } = req.session
     try {
         const searchedUser = await userDAO.getUserById(user._id)
@@ -54,9 +53,9 @@ export const uploadDocument = async (req, res) => {
         let documents = [...searchedUser.documents]
         const files = req.files
         pushDocument(files['identification'], documents)
-        console.log(documents)
+        
         pushDocument(files['address'], documents)
-        console.log(documents)
+        
         pushDocument(files['accountStatus'], documents)
         await userDAO.update(user._id, { documents: documents })
         return res.status(200).json({ message: 'Documents uploaded successfully' })
@@ -69,7 +68,7 @@ export const pushDocument = (file, documents) => {
         return;
     }
     const i = documents.findIndex(d => d.name === file[0].fieldname)
-    req.logger.info(i, file[0].fieldname)
+    
     if (i > -1) { documents.splice(i, 1) }
     const newfile = {
         name: file[0].fieldname,
