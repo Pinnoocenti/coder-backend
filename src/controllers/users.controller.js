@@ -44,7 +44,7 @@ export const uploadDocument = async (req, res) => {
     if (!req.files) {
         return res.status(400).send({ message: 'Error - the document could not be saved' })
     }
-    req.logger.info(error)(req.files)
+    req.logger.info(req.files)
     const { user } = req.session
     try {
         const searchedUser = await userDAO.getUserById(user._id)
