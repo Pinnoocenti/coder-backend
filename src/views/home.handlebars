@@ -1,7 +1,7 @@
 <h1>Los productos agregados hasta el momento son:</h1>
 
 <div>
-    {{#each data.payload}}
+    {{#each products}}
     <div>
         <h3>Producto: {{this.title}}</h3>
         <p>Descripción: {{this.description}}</p>
@@ -15,17 +15,5 @@
     <br>
     <br>
     {{/each}}
-    {{#if data.hasPrevPage}}
-        <button><a href={{data.prevLink}}>Página anterior</a></button>
-    {{/if}}
-
-    <span>Página: {{data.page}}</span>
-
-    {{#if data.hasNextPage}}
-        <button><a href={{data.nextLink}}>Página siguiente</a></button>
-    {{/if}}
     
 </div>
-
-
-<script src="js/index.js"></script>

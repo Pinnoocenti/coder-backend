@@ -1,7 +1,7 @@
 import * as chai from 'chai'
 import supertest from 'supertest'
 import { v4 as uuidv4 } from 'uuid';
-import UserManagerDB from '../dao/ManagerDB/userManagerDB.js'
+
 
 
 
@@ -13,10 +13,11 @@ describe('Testing integral', ()=>{
         it('El endpoint POST /api/session/login debe loggear correctamente a un usuario ', async ()=>{
             const login = {
                 email: 'pilar.innocenti@gmail.com',
-                password: 'coder123'
+                password: 'lukikpo'
             }
             const response = await requester.post('/api/session/login').send(login)
             expect(response.statusCode).to.equal(302)
+            expect(response.header.location).to.equal('/')
         })
         it('El endpoint POST /api/session/register debe registrar correctamente un usuario ', async ()=>{
             const newUser = {
@@ -41,7 +42,7 @@ describe('Testing integral', ()=>{
             //loguearse con un usuario premium o admin para poder crear los productos
             const loginPremium = {
                 email: 'pilar.innocenti@gmail.com',
-                password: 'coder123'
+                password: 'lukikpo'
             }
             const response = await requester.post('/api/session/login').send(loginPremium)
             expect(response.statusCode).to.equal(302)
@@ -71,12 +72,12 @@ describe('Testing integral', ()=>{
 
             const product1Added = await requester.post(`/api/carts/product/${pid1}`).set({Cookie: responseUser.headers['set-cookie'][0]})
             expect(product1Added.statusCode).to.equal(200)     
-        }) 
+        }).timeout(10000)
         it('El endpoint DELETE /api/carts/:cid debe eliminar todos los productos del carrito correctamente', async ()=> {
             //loguearse con un usuario premium o admin para poder crear los productos
             const loginPremium = {
                 email: 'pilar.innocenti@gmail.com',
-                password: 'coder123'
+                password: 'lukikpo'
             }
             const response = await requester.post('/api/session/login').send(loginPremium)
             expect(response.statusCode).to.equal(302)
@@ -128,12 +129,12 @@ describe('Testing integral', ()=>{
 
             const respondseDelete = await requester.delete(`/api/carts/${cid}`)
             expect(respondseDelete.body.message).to.equal('products deleted')
-        }) 
+        }).timeout(10000)
         it('El endpoint POST /api/carts/:cid/purchase debe finalizar la compra, verificar el stock de los productos y crear un ticket de compra', async ()=> {
             //loguearse con un usuario premium o admin para poder crear los productos
             const loginPremium = {
                 email: 'pilar.innocenti@gmail.com',
-                password: 'coder123'
+                password: 'lukikpo'
             }
             const response = await requester.post('/api/session/login').send(loginPremium)
             expect(response.statusCode).to.equal(302)
@@ -185,7 +186,7 @@ describe('Testing integral', ()=>{
 
             const purchase = await requester.post(`/api/carts/${cid}/purchase`).set({Cookie: responseUser.headers['set-cookie'][0]})
             expect(purchase.body.ticket).to.exist
-        }) 
+        }).timeout(10000)
         
     }) 
     

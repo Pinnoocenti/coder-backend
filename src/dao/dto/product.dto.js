@@ -8,7 +8,7 @@ class ProductDTO {
         this.stock = String(product.stock),
         this.status = String(product.status),
         this.category = String(product.category),
-        this.thumbnail = String(''),
+        this.thumbnail = String(product.thumbnail) || String(''),
         this.available = String(product.available),
         this.owner = String(product.owner)
     }

@@ -7,6 +7,7 @@ import session from 'express-session'
 import MongoStore from 'connect-mongo'
 import swaggerJSDoc from 'swagger-jsdoc'
 import swaggerUIExpress from 'swagger-ui-express'
+import productDAO from './dao/Manager/productDAO.js'
 
 import productsRouter from './routes/products.routes.js'
 import cartsRouter from './routes/carts.routes.js'
@@ -30,7 +31,7 @@ app.use(logger)
 
 program.option('--mode <mode>', 'Modo de trabajo', 'production')
 const options = program.parse()
-const { port,secretPassword, mongoURL, mongo_URL_test} = getVariables(options)
+const { port,secretPassword, mongoURL} = getVariables(options)
 
 //SWAGGER
 const specs = swaggerJSDoc(swaggerConfiguration)
@@ -41,6 +42,7 @@ app.use(express.urlencoded({extended:true}))
 app.use(cookieParser(secretPassword))
 app.use(express.static('public'))
 
+//MONGO
 app.use(session({
     secret: secretPassword,
     store: MongoStore.create({
@@ -57,7 +59,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 mongoose.connect(mongoURL)
-
+//HANDLEBARS
 const hbs = handlebars.create({
     runtimeOptions: {
         allowProtoPropertiesByDefault: true 
@@ -95,8 +97,40 @@ const io = new Server(httpServer)
 
 let messages= []
 
-io.on('connect', socket=>{
+io.on('connect', async socket=>{
     console.log('New client connected')
+    //Mostrar todos los productos hasta el momento
+    const products = await productDAO.getProductsHome();
+    if (products.message === "OK") {
+        socket.emit("updateProducts", products.products);
+    }
+    //Agregar producto
+    socket.on('addProd', async prod => {
+        console.log('Agregar un producto ')
+        try {
+         const productAdded = await productDAO.addProduct(prod)
+         if (productAdded){
+          const resultado = await productDAO.getProductsHome()
+          if (resultado.message==="OK"){
+            socket.emit("updateProducts",resultado.products)  
+          }
+         }
+         return products
+        } catch (error) {
+          console.log("There was an error adding the product: ", error)
+        }
+        })
+      //Eliminar producto  
+      socket.on('delProd', async id => {
+        const deleted=await productDAO.deleteProduct(id)
+        if (deleted.message==="ok"){
+          const resultado = await productDAO.getProductsHome()
+          if (resultado.message==="OK"){
+            socket.emit("updateProducts",resultado.products )  
+          }
+        }else
+          console.log("There was an error deleting the product ", deleted.rdo)
+      });
 
     socket.emit('messageLogs', messages)
     socket.on('message', data =>{

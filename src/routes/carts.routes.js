@@ -11,7 +11,7 @@ cartsRouter.delete('/:cid/product/:pid', deleteProductInCartController)
 cartsRouter.put('/:cid', updateCartController)
 cartsRouter.put('/:cid/product/:pid', updateProductInCart)
 cartsRouter.delete('/:cid', deleteAllProductsInCartController)
-cartsRouter.post('/:cid/purchase',postPurchase)
+cartsRouter.post('/:cid/purchase',checkAuth,postPurchase)
 cartsRouter.post('/product/:pid', authorization(['user', 'premium']) ,postProductInCartController)
 
 

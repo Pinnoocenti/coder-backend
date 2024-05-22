@@ -7,13 +7,13 @@ class UserDTO{
         this.lastName = user.lastName,
         this.email = user.email,
         this.password = createHash(user.password),
-        this.rol = user.rol
+        this.role = user.role
     }
     getCurrentUser(){
         return{
         fullName: this.firstName + '' +this.lastName,
         email: this.email,
-        rol: this.rol
+        role: this.role,
         }
     }
 }

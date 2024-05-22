@@ -67,7 +67,7 @@ class CartManagerDB {
     }
     async getProductsCartById(cid) { //falta en fs
         try {
-            const cart = await cartModel.findOne({ _id: cid }).populate('products.product')
+            const cart = await cartModel.findById(cid).populate('products.product')
             return cart
         } catch (error) {
             throw new MyError({

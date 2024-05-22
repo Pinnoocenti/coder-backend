@@ -7,12 +7,14 @@
         <p>Producto: {{this._id}}</p>
         <p>Producto: {{this.title}}</p>
         <p>Descripción: {{this.description}}</p>
+        <img width='150px' src="{{this.thumbnail}}" alt="{{this.title}}">
         <p>Precio: {{this.price}}</p>
         <p>Código: {{this.code}}</p>
         <p>Stock: {{this.stock}}</p>
         <p>Categoría: {{this.category}}</p>
         <p>Status: {{this.status}}</p>
         <p>Habilitado: {{this.available}}</p>
+
 
         <button name="addToCartButton" id="{{this._id}}">Agregar al carrito</button>
     </div>
@@ -29,7 +31,7 @@
     {{/if}}
 </div>
 
-
 <button id="logoutBtn" type="button">Cerrar sesión </button>
+<button><a href="/cart">Ir al carrito</a></button>
 
-<script src="js/products.js"></script>
+<script src="/js/products.js"></script>

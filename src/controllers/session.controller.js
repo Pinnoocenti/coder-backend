@@ -3,17 +3,19 @@ import userDAO from "../dao/Manager/userDAO.js"
 import MailingService from "../services/mailing.js"
 import jwt from 'jsonwebtoken'
 import { generateResetPasswordToken } from "../services/jwt.js"
-import { createHash } from "../config/bcrypt.js"
+import { createHash, isValidPassword } from "../config/bcrypt.js"
+import { logger } from "../utils/logger.js"
+
 
 export const addRegisterController = (req, res) => {
     res.render('userCreateSuccess')
 }
-export const getCurrentUserController = (req,res)=>{
+export const getCurrentUserController = (req, res) => {
     const user = new UserDTO(req.user)
     res.send(user.getCurrentUser())
 }
 export const postLoginSessionController = async (req, res) => {
-    if(!req.user){
+    if (!req.user) {
         return res.status(400).send({ message: 'Error with credentials' })
     }
     const uid = req.user._id
@@ -28,31 +30,38 @@ export const postLoginSessionController = async (req, res) => {
         cart: req.user.cart,
     }
     req.session.save()
-    await userDAO.update(uid, {last_connection: `login ${new Date().toLocaleTimeString()}`})
-    
+    await userDAO.update(uid, { last_connection: `login ${new Date().toISOString()}` })
+
     res.redirect('/')
 }
 export const postLogoutSessionController = async (req, res) => {
-    const uid = req.user._id
-    req.session.user = null
-    await userDAO.update(uid, {last_connection: `logout ${new Date().toLocaleTimeString()}`})
-    console.log('llego hasta aca')
-    res.redirect('/login')
+    try {
+        req.session.destroy((error) => {
+            if (error)
+                return res.status(500).send({ message: 'No se pudo cerrar la sesion' })
+        })
+        await userDAO.update(uid, { last_connection: `logout ${new Date().toISOString()}` })
+        return res.redirect('/login')
+    }
+    catch (error) {
+        res.status(400).send({ error })
+    }
+
 }
-export const sendEmailToResetPassword = async (req,res)=>{
-    const {email} = req.body
-    console.log(email)
+export const sendEmailToResetPassword = async (req, res) => {
+    const { email } = req.body
+    req.logger.debug(email)
     try {
         const user = await userDAO.getUserByEmail(email)
-        console.log(user)
-        if(!user){
+        req.logger.debug(user)
+        if (!user) {
             return res.redirect('/failemail')
         }
-        console.log(user.email)
+        req.logger.debug(user.email)
         const resetToken = generateResetPasswordToken()
         const resetLink = `http://localhost:8080/changepassword?token=${resetToken}`
         const mailingService = new MailingService()
-        
+
         await mailingService.sendSimpleMail({
             from: 'Coder Ecommerce',
             to: user.email,
@@ -64,29 +73,35 @@ export const sendEmailToResetPassword = async (req,res)=>{
                 <button><a href=${resetLink}>Continuar</a></button>
             `
         })
-        res.send({message: 'Email sent successfully'})
+        res.send({ message: 'Email sent successfully' })
 
     } catch (error) {
-        console.log(error)
+        req.logger.error(error)
         res.status(500)
     }
 }
-export const changePassword = async (req,res) =>{
-    const {email, password} = req.body
+export const changePassword = async (req, res) => {
+    const { email, password } = req.body
+    
     try {
+        const hashPassword = createHash(password)
         const user = await userDAO.getUserByEmail(email)
-        await userDAO.update(user._id, {password: createHash(password)})
+        
+        if(isValidPassword(user, password)){
+            return res.status(400).send({message: 'The password has to be different '})
+        }
+        await userDAO.update(user._id, { password: hashPassword })
 
-        return res.send({message: 'Password reseted successful'})
+        return res.send({ message: 'Password reseted successful' })
     } catch (error) {
         throw error
     }
-        
-    
-}
-export const getGithubSessionController = (req, res) => {}
 
-export const getGithubCBController = (req,res)=>{
+
+}
+export const getGithubSessionController = (req, res) => { }
+
+export const getGithubCBController = (req, res) => {
     req.session.user = req.user
     res.redirect('/')
 }

@@ -7,7 +7,7 @@ export const getVariables = (options) =>{
     })
 
     return{
-        port: process.env.PORT,
+        port: process.env.PORT || 8080,
         mongoURL: process.env.MONGO_URL,
         mongo_URL_test: process.env.MONGO_URL_TEST,
         secretPassword: process.env.SECRET_PASSWORD,

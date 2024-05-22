@@ -5,6 +5,7 @@ import userDAO from "../dao/Manager/userDAO.js"
 import MyError from "../errors/myError.js"
 import ErrorEnum from "../errors/error.enum.js"
 import { notFound } from "../errors/info.js"
+import { logger } from "../utils/logger.js"
 
 export const getCartsController = async (req,res,next)=>{
     try {
@@ -27,7 +28,7 @@ export const postCartController = async (req,res)=>{
         const result = await cartDAO.addCart({products: []})
          return res.status(200).json(result)
     } catch (error) {
-        throw error
+        res.status(400).send({message: error.message})
     }
 }
 export const getCartByIdController = async (req,res, next)=>{
@@ -52,34 +53,33 @@ export const postProductInCartController = async (req,res)=>{
         const {pid} = req.params
         let role = req.session.user.role
         let email = req.session.user.email
-        console.log('role', role)
-        console.log('email', email)
+        req.logger.info('role:' + role)
+        req.logger.info('email:' + email)
         if(role === 'premium'){
             const product = await productDAO.getProductById(pid)
-            console.log(product)
-            console.log(product.owner)
+            req.logger.info(product)
+            req.logger.info('The product owner is: ' + product.owner)
             if(product.owner === email){
                 return res.status(400).send({message: 'You can not add this product because you are the owner'})
             }
         }
         const newQuantity = req.body.quantity ?? 1
         let cart = req.session.user.cart
-        console.log('req.session.user._id ', req.session.user)
         if(!cart) {
             const cartAdded = await cartDAO.addCart({products: []})
             cart = cartAdded
-            console.log('cartAdded ', cart)
+            req.logger.info('cartAdded: '+ cart)
             userDAO.update(req.session.user._id, {cart: cart._id})
             req.session.user.cart = cart
             req.session.save()
         }
-        console.log(cart)
         const result = await cartDAO.addProducts(cart._id, pid, newQuantity)
         if(result){
             return res.status(200).json({result, cartId:cart._id})
         }
         res.status(400).json({message: 'could not add product'})
     } catch (error) {
+        req.logger.error(error)
         res.status(400).send({error})
     }
 }
@@ -136,6 +136,7 @@ export const deleteAllProductsInCartController = async (req,res)=>{ //falta en f
             return res.status(404).json({menssage: 'could not delete products'})
         }
     } catch (error) {
+        req.logger.error(error)
         res.status(400).json({message: error})
     }
 }
@@ -143,7 +144,6 @@ export const postPurchase = async (req,res)=>{ //falta el fs
     try {
         const {cid} = req.params
         const {user} = req.session
-        console.log('user:', user)
         let amount = 0
         let noStockProducts = []
 
@@ -160,19 +160,20 @@ export const postPurchase = async (req,res)=>{ //falta el fs
                     await productDAO.updateProduct(searchedProduct._id, {stock: newStock})
                     amount += searchedProduct.price * product.quantity
                     await cartDAO.deleteProductInCart(cid, product.product)
-                } 
-                noStockProducts.push(searchedProduct)
+                } else {
+                    noStockProducts.push(searchedProduct)
+                }
                 await cartDAO.deleteProductInCart(cid, product.product)
             }) 
         )
         
         if(amount === 0){
-            return res.send({noStockProducts})
+            return res.json({noStockProducts})
         }
                 
         const ticket = await ticketDAO.createTicket(amount, user.email)
-        console.log(ticket)
-        return res.send({message: 'Ticket created', ticket})
+        req.logger.info(ticket)
+        return res.json({message: 'Ticket created', ticket, noStockProducts})
         
     } catch (error) {
         res.status(400).json({message: error.message})

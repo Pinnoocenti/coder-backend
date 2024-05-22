@@ -1,26 +1,37 @@
 <div>
     <h3>Agregar un nuevo producto</h3>
 
-    <form action="/api/products" method="post" >
-        <label >Titulo</label> <input type="text" name="title"> <br><br>
-        <label >Descripción</label> <input type="text" name="description"> <br><br>
-        <label >Precio</label> <input type="number" name="price"> <br><br>
-        <label >Código</label> <input type="text" name="code"> <br><br>
-        <label >Stock</label> <input type="number" name="stock"> <br><br>
-        <label >Categoría</label> <input type="text" name="category"> <br><br>
-        <label >Status</label> <input type="text" name="status"> <br><br>
-        <label >Disponible </label> 
+    <form id="addProduct" action="/api/products" method="post">
+        <label>Titulo</label> <input type="text" name="title"> <br><br>
+        <label>Descripción</label> <input type="text" name="description"> <br><br>
+        <label>Precio</label> <input type="number" name="price"> <br><br>
+        <label>Código</label> <input type="text" name="code"> <br><br>
+        <label>Stock</label> <input type="number" name="stock"> <br><br>
+        <label>Categoría</label> <input type="text" name="category"> <br><br>
+        <label>Status</label> <input type="text" name="status"> <br><br>
+        <label>Disponible </label>
         <select name="available">
-            <option >si</option>
-            <option >no</option>
+            <option>si</option>
+            <option>no</option>
         </select> <br><br>
         <button id="sendInfo">Agregar</button>
     </form>
 
-    <div id="outputInfo"></div>
+    <div id="outputInfo">
+        {{#each product}}
+        <div class="product-item">
+            <p>Id: {{this._id}}</p>
+            <p>Title: {{this.title}}</p>
+            <p>Description: {{this.description}}</p>
+            <p>Price: {{this.price}}</p>
+            <p>Status: {{this.status}}</p>
+            <p>Code: {{this.code}}</p>
+            <p>Stock: {{this.stock}}</p>
+            <button id={{this._id}}>Eliminar</button>
+        </div>
+        {{/each}}
+    </div>
 </div>
 
-
-
 <script src="/socket.io/socket.io.js"></script>
-<script src="js/index.js"></script>
+<script src="/js/index.js"></script>

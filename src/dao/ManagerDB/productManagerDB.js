@@ -21,6 +21,18 @@ class ProductManagerDB {
             return { message: "error", rdo: "There are no products" }
         }
     }
+    async getProductsHome() {
+        try {
+            const productsData = await productModel.find()
+            if(productsData){
+                return {message: 'OK', products: productsData}
+            }
+            return { message: "error - The product does not exist"}
+
+        } catch (error) {
+            return { message: "error", rdo: "There are no products" }
+        }
+    }
 
     async addProduct(product) {
         try {

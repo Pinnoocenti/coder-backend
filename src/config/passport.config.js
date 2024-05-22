@@ -65,12 +65,17 @@ const initializePassport = () => {
         {
             clientID: 'Iv1.146ccf33342c5ecd',
             callbackURL: 'http://localhost:8080/api/session/githubcallback',
-            clientSecret: '03820cd4e8020bb5a58e0eb7eb5ebadd3ee47394'
+            clientSecret: 'a32518bf15b61c11616577f8c961c271d3325741',
+            scope: ['user:email']
         },
         async (accessToken, refreshToken, profile, done) => {
             try {
-                console.log({ profile })
-                const user = await userDAO.getUserByEmail({ email: profile._json.email })
+                console.log(profile )
+                console.log(profile.emails[0].value)
+                const user = await userDAO.getUserByEmail(profile.username)
+                const email = profile.emails[0].value
+                let role = ''
+            
                 if (!user) {
                     if(email === 'adminCoder@coder.com'){
                         role = 'admin'
@@ -81,12 +86,16 @@ const initializePassport = () => {
                         firstName: profile._json.name.split(' ')[0],
                         lastName: profile._json.name.split(' ')[1],
                         age: 21, // pongo una edad aleatoria ya que no viene de github
-                        email: profile.username,
+                        email,
                         role,
                         password: 'githubGenerated'
                     }
                     const result = await userDAO.createUser(newUser)
-                    return done(null, result)
+                    if (result.message === 'The user was created') {
+                        return done(null, result.userCreated)
+                    } else {
+                        return done(null, false, { message: 'Error creating user' })
+                    }
                 }
                 return done(null, user)
             } catch (error) {

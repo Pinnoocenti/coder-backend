@@ -1,0 +1,55 @@
+<h3>Usuarios</h3>
+<div>
+    {{#each users}}
+    <div class="user-item">
+        <p>Usuario: {{this.firstName}} {{this.lastName}}</p>
+        <p>Email: {{this.email}}</p>
+        <p>Rol: {{this.role}}</p>
+    </div>
+    <form id="modifyForm{{this._id}}" action="#" method="post">
+        <button type="button" onclick="modifyUser('{{this._id}}')">Modificar rol del usuario</button>
+    </form><br>
+    <form id="deleteForm{{this._id}}" action="#" method="post">
+        <button type="button" onclick="deleteUser('{{this.email}}')">Eliminar usuario</button>
+    </form>
+
+    <script>
+        function modifyUser(userId) {
+            fetch("/api/users/premium/" + userId, {
+                method: 'PUT'
+            }).then(response => {
+                if (response.ok) {
+                    console.log("Rol de usuario modificado exitosamente")
+                    window.location.href = '/usersView'
+                } else {
+                    response.json().then(data => {
+                        alert(data.message)
+                    })
+                    console.error("Error al modificar el rol del usuario")
+                }
+            }).catch(error => {
+                console.error("Error:", error)
+            })
+        }
+
+        function deleteUser(email) {
+            fetch("/api/users/" + email, {
+                method: 'DELETE'
+            }).then(response => {
+                if (response.ok) {
+                    console.log("Usuario eliminado exitosamente")
+                    window.location.href = '/usersView'
+                } else {
+                    response.json().then(data => {
+                        alert(data.message)
+                    })
+                }
+            }).catch(error => {
+                console.error("Error:", error)
+            });
+        }
+    </script>
+
+    {{/each}}
+
+</div>

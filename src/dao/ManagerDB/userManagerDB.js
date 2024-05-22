@@ -3,10 +3,11 @@ import { databaseError } from "../../errors/info.js";
 import MyError from "../../errors/myError.js";
 import { userModel } from "../models/user.model.js";
 
+
 class UserManagerDB{
     async createUser (newUser){
         try {
-            if(!newUser.firstName || !newUser.lastName || !newUser.email || !newUser.email || !newUser.age || !newUser.password || !newUser.role){
+            if(!newUser.firstName || !newUser.lastName || !newUser.email || !newUser.age || !newUser.password || !newUser.role){
                 return { message: 'error - Incomplete user' }
             }
             const userCreated = await userModel.create(newUser)
@@ -71,6 +72,20 @@ class UserManagerDB{
             throw error
         }
     }
+    async getUsers (){
+        try {
+            const users = await userModel.find()
+            return users;
+        } catch (error) {
+            throw new MyError({
+                name: 'Unexpected database error', 
+                cause: databaseError(),
+                message: error.message,
+                code: ErrorEnum.DATABASE_ERROR,
+            })
+        }
+    }
+    
     
 }
 

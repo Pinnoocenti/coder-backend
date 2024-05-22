@@ -1,0 +1,55 @@
+<h3>Carrito</h3>
+
+<div>
+    {{#each products}}
+    <div>
+        <p>Producto: {{this.product.title}} - Cantidad {{this.quantity}} - Precio: $ {{this.product.price}}</p>
+    </div>
+    {{/each}}
+</div>
+
+<form id="purchaseForm" action="/api/carts/{{cid}}/purchase" method="post">
+    <button id="purchaseButton" type="submit">Finalizar la compra</button>
+</form>
+
+<div id="purchaseResult">
+
+</div>
+
+<script>
+    document.getElementById('purchaseForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+        document.getElementById('purchaseButton').disabled = true;
+
+        fetch(this.action, {
+            method: 'POST'
+        }).then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Error al procesar la solicitud de compra');
+            }
+        }).then(data => {
+            let noProductsHTML = ''
+            if (data.noStockProducts.length > 0) {
+                noProductsHTML = '<p>Algunos productos no tienen stock:</p>'
+                data.noStockProducts.forEach(product => {
+                    noProductsHTML += `<p>${product.title}</p>`;
+                })
+            }
+
+            let ticketHTML = ''
+            if (data.ticket) {        
+                 ticketHTML = 
+                 `<p>Código del ticket: ${data.ticket.result.code}</p>
+                <p>Monto total: $ ${data.ticket.result.amount}</p> `
+                
+            }
+            document.getElementById('purchaseResult').innerHTML = noProductsHTML + ticketHTML
+
+        }).catch (error => {
+        console.error('Error:', error);
+        document.getElementById('purchaseResult').innerHTML = '<p>Error al procesar la solicitud de compra</p>';
+    });
+    });
+</script>

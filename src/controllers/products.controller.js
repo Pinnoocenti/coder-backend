@@ -2,7 +2,8 @@ import { uploader } from "../utils/multer.js";
 import ProductDTO from "../dao/dto/product.dto.js";
 import productDAO from "../dao/Manager/productDAO.js";
 import { generateProduct } from "../utils/mock.js";
-
+import MailingService from "../services/mailing.js";
+import { logger } from "../utils/logger.js";
 
 
 
@@ -32,13 +33,14 @@ export const getProductByIdController = async (req, res) => {
         res.status(400).json({ message: 'The products does not exist' })
     }
 }
-export const addProductController = /*uploader.single('file'),*/ async (req, res) => {
+export const addProductController =  async (req, res) => {
     try {
+        req.logger.info('file ',req.file)
         const newProduct = new ProductDTO(req.body)
-        //const path = req.file.path.split('public').join('')
-        //await product.addProduct({...newProduct/*, thunbnail: path*/})
+        if (req.file) {
+            newProduct.thumbnail = req.file.path.split('public')[1]
+        }
         let role = req.session.user.role
-        console.log(role)
         if (role === 'premium') {
             newProduct.owner = req.session.user.email
         }
@@ -76,6 +78,7 @@ export const updateProducstController = async (req, res) => {
         res.status(400).json(result)
 
     } catch (error) {
+        req.logger.error(error)
         res.status(400).send(error)
     }
 }
@@ -84,9 +87,8 @@ export const deleteProductController = async (req, res) => {
     try {
         const role = req.session.user.role
         const email = req.session.user.email
-
+        const product = await productDAO.getProductById(pid)
         if (role === 'premium') {
-            const product = await productDAO.getProductById(pid)
             if(product.message === 'error'){
                 return res.status(404).send({ message: 'Product not found' })
             }
@@ -95,7 +97,24 @@ export const deleteProductController = async (req, res) => {
             }
         }
         const deleted = await productDAO.deleteProduct(pid)
+
         if (deleted.message === 'ok') {
+            const mailingService = new MailingService()
+            await mailingService.sendSimpleMail({
+            from: 'Coder Ecommerce',
+            to: product.owner,
+            subject: 'Producto eliminado',
+            html: `
+                
+                <h3>Le informamos que su producto: </h3> 
+                    <div>
+                        <h4>Titulo: ${product.title} </h4> 
+                        <h4>Descripción: ${product.description} </h4> 
+                        <h4>Código: ${product.code} </h4> 
+                    </div>
+                <h3>ha sido eliminado </h3>     
+            `
+        })
             return res.status(200).json(deleted.rdo)
         }
         return res.status(404).json(deleted.rdo)
