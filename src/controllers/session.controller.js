@@ -59,7 +59,8 @@ export const sendEmailToResetPassword = async (req, res) => {
         }
         req.logger.debug(user.email)
         const resetToken = generateResetPasswordToken()
-        const resetLink = `${req.headers.host}/changepassword?token=${resetToken}`
+        const host = process.env.RAILWAY_URL || 'localhost:8080'
+        const resetLink = `${host}/changepassword?token=${resetToken}`
         req.logger.info(resetLink)
         const mailingService = new MailingService()
 
