@@ -1,5 +1,4 @@
 import UserManagerDB from "../ManagerDB/userManagerDB.js";
-import UserManagerFS from "../ManagerFS/userManagerFS.js";
 
 let userDAO 
 
@@ -10,7 +9,7 @@ switch (DAO_OPTION) {
         userDAO = new UserManagerDB()
         break;
     case 'fs':
-        userDAO = new UserManagerFS()
+        //userDAO = new UserManagerFS()
         break;
 
     default:

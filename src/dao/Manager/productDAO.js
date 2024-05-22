@@ -1,4 +1,4 @@
-import ProductManager from "../ManagerFS/ProductManager.js";
+//import ProductManager from "../ManagerFS/ProductManager.js";
 import ProductManagerDB from "../ManagerDB/productManagerDB.js";
 
 let productDAO 
@@ -10,7 +10,7 @@ switch (DAO_OPTION) {
         productDAO = new ProductManagerDB()
         break;
     case 'fs':
-        productDAO = new ProductManager()
+        //productDAO = new ProductManager()
         break;
 
     default:

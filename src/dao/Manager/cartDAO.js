@@ -1,5 +1,5 @@
 import CartManagerDB from "../ManagerDB/cartManagerDB.js";
-import CartManager from "../ManagerFS/cartManager.js";
+//import CartManager from "../ManagerFS/cartManager.js";
 
 let cartDAO 
 
@@ -10,7 +10,7 @@ switch (DAO_OPTION) {
         cartDAO = new CartManagerDB()
         break;
     case 'fs':
-        cartDAO = new CartManager()
+        //cartDAO = new CartManager()
         break;
 
     default:

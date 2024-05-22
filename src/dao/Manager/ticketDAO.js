@@ -1,5 +1,5 @@
 import TicketManagerDB from "../ManagerDB/ticketManagerDB.js";
-import TicketManagerFS from "../ManagerFS/ticketManagerFS.js";
+//import TicketManagerFS from "../ManagerFS/ticketManagerFS.js";
 
 let ticketDAO 
 
@@ -10,7 +10,7 @@ switch (DAO_OPTION) {
         ticketDAO = new TicketManagerDB()
         break;
     case 'fs':
-        ticketDAO = new TicketManagerFS()
+        //ticketDAO = new TicketManagerFS()
         break;
 
     default:
