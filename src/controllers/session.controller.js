@@ -59,7 +59,7 @@ export const sendEmailToResetPassword = async (req, res) => {
         }
         req.logger.debug(user.email)
         const resetToken = generateResetPasswordToken()
-        const resetLink = `${req.get('host')}/changepassword?token=${resetToken}`
+        const resetLink = `${req.headers.host}/changepassword?token=${resetToken}`
         req.logger.info(resetLink)
         const mailingService = new MailingService()
 
