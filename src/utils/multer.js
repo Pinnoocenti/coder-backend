@@ -15,7 +15,11 @@ const storage = multer.diskStorage({
     filename: (req, file, cb)=>{
         const userId = req.session.user._id
         console.log(userId + file.fieldname)
-        cb(null, userId + '-' + file.fieldname + '.' + file.originalname.split('.')[1])
+        if (file.fieldname === 'thumbnail') {
+            cb(null, file.fieldname + '-' + file.originalname)
+        } else {
+            cb(null, userId + '-' + file.fieldname + '.' + file.originalname.split('.')[1])
+        }
     }
 })
 
