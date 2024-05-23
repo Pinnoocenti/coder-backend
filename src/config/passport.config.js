@@ -64,7 +64,7 @@ const initializePassport = () => {
     passport.use('github', new GithubStrategy(
         {
             clientID: 'Iv1.146ccf33342c5ecd',
-            callbackURL: `${process.env.RAILWAY_URL}/api/session/githubcallback`,
+            callbackURL: 'http://localhost:8080/api/session/githubcallback',
             clientSecret: 'a32518bf15b61c11616577f8c961c271d3325741',
             scope: ['user:email']
         },
